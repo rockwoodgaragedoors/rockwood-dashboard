@@ -2,6 +2,7 @@ const https = require('https');
 
 exports.handler = async (event) => {
   const JOBBER_API_KEY = process.env.JOBBER_API_KEY;
+  console.log('Jobber API Key exists:', !!JOBBER_API_KEY);
   
   // Enable CORS
   const headers = {
