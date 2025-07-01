@@ -247,10 +247,17 @@ async function fetchMondayOrderStatus() {
             body: JSON.stringify({
                 query: `
                     query {
-                        boards {
-                            items {
-                                column_values(ids: ["status"]) {
-                                    text
+                        boards(limit: 1) {
+                            id
+                            name
+                            items_page {
+                                items {
+                                    id
+                                    name
+                                    column_values {
+                                        id
+                                        text
+                                        value
                                 }
                             }
                         }
@@ -261,7 +268,7 @@ async function fetchMondayOrderStatus() {
 
         const data = await response.json();
         console.log('Monday response:', JSON.stringify(data, null, 2));
-        displayOrderStatusChart(data.data.boards[0].items);
+        displayOrderStatusChart(data.data.boards[0].items_page.items);
     } catch (error) {
         console.error('Error fetching Monday.com data:', error);
     }
