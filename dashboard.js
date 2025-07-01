@@ -71,6 +71,7 @@ async function fetchJobberJobs() {
         });
 
         const data = await response.json();
+        console.log('Jobber response:', data); 
         displayJobs(data.data.visits.nodes);
     } catch (error) {
         console.error('Error fetching Jobber jobs:', error);
@@ -146,6 +147,7 @@ async function fetchJobberRevenue() {
         });
 
         const data = await response.json();
+        console.log('Jobber revenue response:', data);
         calculateAndDisplayRevenue(data.data.invoices.nodes);
     } catch (error) {
         console.error('Error fetching revenue:', error);
@@ -221,7 +223,7 @@ async function fetchOpenPhoneStats() {
         });
 
         const data = await response.json();
-        
+        console.log('OpenPhone response:', data);
         const totalCalls = data.data.length;
         const missedCalls = data.data.filter(call => call.status === 'missed').length;
         
@@ -258,6 +260,7 @@ async function fetchMondayOrderStatus() {
         });
 
         const data = await response.json();
+        console.log('Monday response:', data);
         displayOrderStatusChart(data.data.boards[0].items);
     } catch (error) {
         console.error('Error fetching Monday.com data:', error);
