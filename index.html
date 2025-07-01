@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rockwood Garage Doors Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .dashboard {
+            height: 100vh;
+            padding: 20px;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(255, 102, 26, 0.3);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            height: 60px;
+        }
+
+        .company-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff661a;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .datetime {
+            text-align: right;
+        }
+
+        .date {
+            font-size: 24px;
+            color: #ff661a;
+            margin-bottom: 5px;
+        }
+
+        .time {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .widget {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .widget:hover {
+            border-color: #ff661a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 102, 26, 0.4);
+        }
+
+        .widget-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ff661a;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .widget-icon {
+            width: 30px;
+            height: 30px;
+            background: #ff661a;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Jobber Jobs Widget */
+        .jobs-widget {
+            grid-column: span 1;
+        }
+
+        .jobs-section {
+            margin-bottom: 20px;
+        }
+
+        .jobs-section h3 {
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .job-item {
+            background: rgba(255, 102, 26, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 4px solid #ff661a;
+        }
+
+        .job-time {
+            font-size: 14px;
+            color: #ff661a;
+            font-weight: bold;
+        }
+
+        .job-customer {
+            font-size: 16px;
+            color: #fff;
+            margin-top: 4px;
+        }
+
+        .job-address {
+            font-size: 13px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* Revenue Widget */
+        .revenue-widget {
+            grid-column: span 1;
+        }
+
+        .revenue-item {
+            background: rgba(40, 40, 40, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .revenue-label {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .revenue-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .revenue-comparison {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .positive {
+            color: #4ade80;
+        }
+
+        .negative {
+            color: #f87171;
+        }
+
+        /* Phone Stats Widget */
+        .phone-widget {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .phone-stat {
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .phone-stat-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff661a;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .phone-stat-label {
+            font-size: 16px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Monday.com Chart Widget */
+        .chart-container {
+            width: 100%;
+            height: calc(100% - 50px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Vehicle Map Widget */
+        .vehicle-widget {
+            grid-column: span 2;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: calc(100% - 50px);
+            background: #1a1a1a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+        }
+
+        /* Notes Widget */
+        .notes-widget {
+            grid-row: span 2;
+        }
+
+        .notes-content {
+            width: 100%;
+            height: calc(100% - 50px);
+            background: rgba(40, 40, 40, 0.6);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            color: #fff;
+            font-size: 16px;
+            resize: none;
+            font-family: inherit;
+        }
+
+        .notes-content:focus {
+            outline: none;
+            border-color: #ff661a;
+        }
+
+        /* YTD Revenue Widget */
+        .ytd-widget {
+            grid-column: span 1;
+        }
+
+        .ytd-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: calc(100% - 50px);
+        }
+
+        .ytd-item {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .ytd-year {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .ytd-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff661a;
+        }
+
+        .ytd-divider {
+            width: 2px;
+            height: 80%;
+            background: #444;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 102, 26, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff661a;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments for different TV sizes */
+        @media (max-width: 1920px) {
+            .widget-title { font-size: 20px; }
+            .time { font-size: 32px; }
+            .date { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <div class="logo-section">
+                <img src="RGD- Transparent.jpg" alt="Rockwood Garage Doors" class="logo">
+                <div class="company-name">Dashboard</div>
+            </div>
+            <div class="datetime">
+                <div class="date" id="current-date"></div>
+                <div class="time" id="current-time"></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Today's & Tomorrow's Jobs -->
+            <div class="widget jobs-widget">
+                <div class="widget-title">
+                    <div class="widget-icon">📅</div>
+                    <span>Scheduled Jobs</span>
+                </div>
+                <div class="jobs-section">
+                    <h3>Today</h3>
+                    <div id="today-jobs">
+                        <div class="loading"></div>
+                    </div>
+                </div>
+                <div class="jobs-section">
+                    <h3>Tomorrow</h3>
+                    <div id="tomorrow-jobs">
+                        <div class="loading"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue vs BEP -->
+            <div class="widget revenue-widget">
+                <div class="widget-title">
+                    <div class="widget-icon">💰</div>
+                    <span>Revenue vs Break-Even</span>
+                </div>
+                <div class="revenue-item">
+                    <div>
+                        <div class="revenue-label">Daily</div>
+                        <div class="revenue-value" id="daily-revenue">$0</div>
+                        <div class="revenue-comparison">
+                            BEP: $2,917 (<span id="daily-diff">$0</span>)
+                        </div>
+                    </div>
+                </div>
+                <div class="revenue-item">
+                    <div>
+                        <div class="revenue-label">Weekly</div>
+                        <div class="revenue-value" id="weekly-revenue">$0</div>
+                        <div class="revenue-comparison">
+                            BEP: $14,585 (<span id="weekly-diff">$0</span>)
+                        </div>
+                    </div>
+                </div>
+                <div class="revenue-item">
+                    <div>
+                        <div class="revenue-label">Monthly</div>
+                        <div class="revenue-value" id="monthly-revenue">$0</div>
+                        <div class="revenue-comparison">
+                            BEP: $62,706 (<span id="monthly-diff">$0</span>)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YTD Revenue -->
+            <div class="widget ytd-widget">
+                <div class="widget-title">
+                    <div class="widget-icon">📊</div>
+                    <span>Year-to-Date Revenue</span>
+                </div>
+                <div class="ytd-comparison">
+                    <div class="ytd-item">
+                        <div class="ytd-year">2024 YTD</div>
+                        <div class="ytd-value" id="ytd-previous">$0</div>
+                    </div>
+                    <div class="ytd-divider"></div>
+                    <div class="ytd-item">
+                        <div class="ytd-year">2025 YTD</div>
+                        <div class="ytd-value" id="ytd-current">$0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Stats -->
+            <div class="widget phone-widget">
+                <div class="widget-title" style="width: 100%;">
+                    <div class="widget-icon">📞</div>
+                    <span>OpenPhone Statistics</span>
+                </div>
+                <div class="phone-stat">
+                    <div class="phone-stat-value" id="call-volume">0</div>
+                    <div class="phone-stat-label">Total Calls Today</div>
+                </div>
+                <div class="phone-stat">
+                    <div class="phone-stat-value" id="missed-calls">0</div>
+                    <div class="phone-stat-label">Missed Calls</div>
+                </div>
+            </div>
+
+            <!-- Monday.com Order Status -->
+            <div class="widget">
+                <div class="widget-title">
+                    <div class="widget-icon">📈</div>
+                    <span>Monday.com Order Status</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Vehicle Locations -->
+            <div class="widget vehicle-widget">
+                <div class="widget-title">
+                    <div class="widget-icon">🚛</div>
+                    <span>Fleet Locations</span>
+                </div>
+                <div class="map-placeholder" id="vehicle-map">
+                    Waiting for AirIQ Fleet API access...
+                </div>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="widget notes-widget">
+                <div class="widget-title">
+                    <div class="widget-icon">📝</div>
+                    <span>Notes</span>
+                </div>
+                <textarea class="notes-content" id="notes-area" placeholder="Type your notes here..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
