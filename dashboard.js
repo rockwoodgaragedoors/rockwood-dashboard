@@ -280,7 +280,6 @@ function displayOrderStatusChart(items) {
     const statusCounts = {};
     
     items.forEach(item => {
-        console.log('Item columns:', item.column_values);  // ADD THIS LINE HERE
         // Find the status column value
         const statusColumn = item.column_values.find(col => col.id === 'status');
         statusCounts[status] = (statusCounts[status] || 0) + 1;
