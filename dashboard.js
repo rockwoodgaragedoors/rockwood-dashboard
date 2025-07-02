@@ -347,6 +347,7 @@ const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo', 'Default', 'D
     });
 }
 // Fetch AirIQ Fleet vehicle locations
+// Fetch AirIQ Fleet vehicle locations
 async function fetchAirIQVehicles() {
     try {
         // First, get the list of companies
@@ -373,6 +374,7 @@ async function fetchAirIQVehicles() {
             });
 
             const fleetsData = await fleetsResponse.json();
+            console.log('Fleets response status:', fleetsResponse.status);  // NEW LINE
             console.log('AirIQ Fleets:', fleetsData);
 
             if (fleetsData && fleetsData.length > 0) {
@@ -388,6 +390,26 @@ async function fetchAirIQVehicles() {
 
                 const assetsData = await assetsResponse.json();
                 displayVehicleLocations(assetsData);
+            } else {
+                // NEW SECTION - If no fleets found, try getting all assets directly
+                console.log('No fleets found, trying direct asset approach...');
+                
+                // Try AEMP endpoint which returns all assets
+                const aempResponse = await fetch('/.netlify/functions/airiq', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ endpoint: '/aemp' })
+                });
+                
+                const aempData = await aempResponse.json();
+                console.log('AEMP data:', aempData);
+                
+                if (aempData) {
+                    // Convert AEMP format to our display format
+                    displayVehicleLocations(aempData);
+                }
             }
         }
     } catch (error) {
