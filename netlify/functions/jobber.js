@@ -2,19 +2,6 @@ const https = require('https');
 
 exports.handler = async (event) => {
   const JOBBER_API_KEY = process.env.JOBBER_API_KEY;
-  // TEMPORARY DEBUG
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      keyExists: !!JOBBER_API_KEY,
-      keyLength: JOBBER_API_KEY ? JOBBER_API_KEY.length : 0,
-      envVars: Object.keys(process.env).filter(key => key.includes('API') || key.includes('TOKEN'))
-    })
-  };
   console.log('Jobber API Key exists:', !!JOBBER_API_KEY);
   
   // Enable CORS
