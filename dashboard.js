@@ -286,7 +286,7 @@ function displayOrderStatusChart(items) {
     })));
     
     // Statuses to exclude from the chart
-    const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo'];
+const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo', 'Default', 'DONE', 'DONE (OTHER)', 'DAMAGED', 'MISSING PHOTO'];
     
     items.forEach(item => {
         // Find the status column value
