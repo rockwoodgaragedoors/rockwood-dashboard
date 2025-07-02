@@ -346,7 +346,91 @@ const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo', 'Default', 'D
         }
     });
 }
+// Fetch AirIQ Fleet vehicle locations
+async function fetchAirIQVehicles() {
+    try {
+        // First, get the list of companies
+        const companiesResponse = await fetch('/.netlify/functions/airiq', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ endpoint: '/v2/companies' })
+        });
 
+        const companiesData = await companiesResponse.json();
+        console.log('AirIQ Companies:', companiesData);
+
+        if (companiesData && companiesData.length > 0) {
+            // Get fleets for the first company
+            const companyId = companiesData[0].id;
+            const fleetsResponse = await fetch('/.netlify/functions/airiq', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ endpoint: `/v2/companies/${companyId}/fleets` })
+            });
+
+            const fleetsData = await fleetsResponse.json();
+            console.log('AirIQ Fleets:', fleetsData);
+
+            if (fleetsData && fleetsData.length > 0) {
+                // Get assets status for the first fleet
+                const fleetId = fleetsData[0].id;
+                const assetsResponse = await fetch('/.netlify/functions/airiq', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ endpoint: `/v2/fleets/${fleetId}/assets/status` })
+                });
+
+                const assetsData = await assetsResponse.json();
+                displayVehicleLocations(assetsData);
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching AirIQ data:', error);
+        document.getElementById('vehicle-map').innerHTML = '<div style="color: #f87171;">Error loading vehicle data</div>';
+    }
+}
+
+// Display vehicle locations
+function displayVehicleLocations(vehicles) {
+    const mapDiv = document.getElementById('vehicle-map');
+    
+    if (!vehicles || vehicles.length === 0) {
+        mapDiv.innerHTML = '<div style="color: #666;">No vehicles found</div>';
+        return;
+    }
+
+    // Create a list of vehicles with their locations
+    const vehicleHTML = vehicles.map(vehicle => {
+        const status = vehicle.status || {};
+        return `
+            <div style="background: rgba(255, 102, 26, 0.1); padding: 10px; margin: 5px; border-radius: 8px; border-left: 4px solid #ff661a;">
+                <div style="font-weight: bold; color: #ff661a;">${vehicle.name || 'Unknown Vehicle'}</div>
+                <div style="font-size: 14px; color: #ccc;">
+                    ${status.latitude && status.longitude ? 
+                        `Location: ${status.latitude.toFixed(4)}, ${status.longitude.toFixed(4)}` : 
+                        'Location unavailable'}
+                </div>
+                <div style="font-size: 14px; color: #888;">
+                    ${status.speed ? `Speed: ${status.speed} km/h` : ''}
+                    ${status.heading ? ` | Heading: ${status.heading}°` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    mapDiv.innerHTML = `
+        <div style="height: 100%; overflow-y: auto;">
+            <div style="color: #ff661a; font-size: 16px; margin-bottom: 10px;">Fleet Vehicles (${vehicles.length})</div>
+            ${vehicleHTML}
+        </div>
+    `;
+}
 // Save and load notes
 function setupNotes() {
     const notesArea = document.getElementById('notes-area');
@@ -369,6 +453,8 @@ function refreshAllData() {
     fetchJobberRevenue();
     fetchOpenPhoneStats();
     fetchMondayOrderStatus();
+    fetchAirIQVehicles();
+
 }
 
 // Initialize dashboard
