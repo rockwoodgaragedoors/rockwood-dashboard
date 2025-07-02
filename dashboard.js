@@ -285,14 +285,19 @@ function displayOrderStatusChart(items) {
         status: item.column_values.find(col => col.id === 'status')
     })));
     
-    items.forEach(item => {
-        // Find the status column value
-        const statusColumn = item.column_values.find(col => col.id === 'status');
-        const status = statusColumn?.text || 'Unknown';
-        if (status && status !== '') {  // Only count non-empty statuses
-            statusCounts[status] = (statusCounts[status] || 0) + 1;
-        }
-    });
+  // Statuses to exclude from the chart
+const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo'];
+
+items.forEach(item => {
+    // Find the status column value
+    const statusColumn = item.column_values.find(col => col.id === 'status');
+    const status = statusColumn?.text || 'Unknown';
+    
+    // Only count non-empty statuses that aren't in the excluded list
+    if (status && status !== '' && !excludedStatuses.includes(status)) {
+        statusCounts[status] = (statusCounts[status] || 0) + 1;
+    }
+});
 
     console.log('Status counts:', statusCounts);
 
