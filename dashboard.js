@@ -284,7 +284,7 @@ function displayOrderStatusChart(items) {
         const statusColumn = item.column_values.find(col => col.id === 'status');
         statusCounts[status] = (statusCounts[status] || 0) + 1;
     });
-
+   console.log('Status counts:', statusCounts);  // ADD THIS LINE
     const ctx = document.getElementById('orderStatusChart').getContext('2d');
     new Chart(ctx, {
         type: 'pie',
