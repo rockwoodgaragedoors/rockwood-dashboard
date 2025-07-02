@@ -285,19 +285,19 @@ function displayOrderStatusChart(items) {
         status: item.column_values.find(col => col.id === 'status')
     })));
     
-  // Statuses to exclude from the chart
-const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo'];
-
-items.forEach(item => {
-    // Find the status column value
-    const statusColumn = item.column_values.find(col => col.id === 'status');
-    const status = statusColumn?.text || 'Unknown';
+    // Statuses to exclude from the chart
+    const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo'];
     
-    // Only count non-empty statuses that aren't in the excluded list
-    if (status && status !== '' && !excludedStatuses.includes(status)) {
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
-    }
-});
+    items.forEach(item => {
+        // Find the status column value
+        const statusColumn = item.column_values.find(col => col.id === 'status');
+        const status = statusColumn?.text || 'Unknown';
+        
+        // Only count non-empty statuses that aren't in the excluded list
+        if (status && status !== '' && !excludedStatuses.includes(status)) {
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+        }
+    });
 
     console.log('Status counts:', statusCounts);
 
@@ -313,14 +313,18 @@ items.forEach(item => {
             labels: Object.keys(statusCounts),
             datasets: [{
                 data: Object.values(statusCounts),
-                backgroundColor: [
-                    '#ff661a',
-                    '#ff8c4d',
-                    '#ffb380',
-                    '#ffd9b3',
-                    '#666666',
-                    '#999999'
-                ],
+                backgroundColor: Object.keys(statusCounts).map(status => {
+                    // Match Monday.com colors
+                    const colorMap = {
+                        'RETURN VISIT REQUIRED': '#ff6b6b',  // Red/Orange
+                        'SCHEDULED FOR INSTALL': '#51cf66',  // Green
+                        'IN THE SHOP': '#94d0cc',           // Light teal/green
+                        'ORDERED': '#aa78d6',               // Purple
+                        'Yes (has been, no email)': '#aa78d6', // Purple
+                        // Add more status-color mappings as needed
+                    };
+                    return colorMap[status] || '#666666'; // Default gray for unmapped statuses
+                }),
                 borderColor: '#1a1a1a',
                 borderWidth: 2
             }]
