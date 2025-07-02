@@ -242,17 +242,23 @@
     grid-row: span 2;
 }
 
-        .map-placeholder {
-            width: 100%;
-            height: calc(100% - 50px);
-            background: #1a1a1a;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 18px;
-        }
+       .map-placeholder {
+    width: 100%;
+    height: calc(100% - 50px);
+    background: #1a1a1a;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 18px;
+}
+
+#vehicle-map {
+    width: 100%;
+    height: calc(100% - 50px);
+    border-radius: 10px;
+}
 
         /* Notes Widget */
     .notes-widget {
@@ -473,6 +479,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>
