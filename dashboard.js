@@ -453,8 +453,17 @@ function displayVehicleLocations(vehicles) {
         const name = vehicle.name || status.name || 'Unknown Vehicle';
         
         if (lat && lng) {
-            vehiclesWithLocation++;
-            const marker = L.marker([lat, lng]).addTo(vehicleMap);
+    vehiclesWithLocation++;
+    
+    // Create a custom icon with the vehicle name
+    const vehicleIcon = L.divIcon({
+        className: 'vehicle-label',
+        html: `<div style="background: #ff661a; color: white; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-weight: bold; font-size: 12px;">${name}</div>`,
+        iconSize: [name.length * 8 + 16, 24],
+        iconAnchor: [(name.length * 8 + 16) / 2, 24]
+    });
+    
+    const marker = L.marker([lat, lng], { icon: vehicleIcon }).addTo(vehicleMap);
             
             // Create popup content
             let popupContent = `<strong>${name}</strong><br/>`;
