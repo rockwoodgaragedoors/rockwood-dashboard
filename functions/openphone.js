@@ -2,7 +2,12 @@ const https = require('https');
 
 exports.handler = async (event) => {
   const OPENPHONE_API_KEY = process.env.OPENPHONE_API_KEY;
-  
+   // TEMPORARY DEBUG - Remove after testing
+  console.log('OpenPhone key check:', {
+    exists: !!OPENPHONE_API_KEY,
+    length: OPENPHONE_API_KEY ? OPENPHONE_API_KEY.length : 0,
+    firstChars: OPENPHONE_API_KEY ? OPENPHONE_API_KEY.substring(0, 5) + '...' : 'none'
+  });
   // Enable CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
