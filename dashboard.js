@@ -247,10 +247,15 @@ async function fetchMondayOrderStatus() {
             body: JSON.stringify({
                 query: `
                     query {
-                        boards(limit: 1) {
+                        boards {
                             id
                             name
-                            items_page {
+                            columns {
+                                id
+                                title
+                                type
+                            }
+                            items_page(limit: 50) {
                                 items {
                                     id
                                     name
