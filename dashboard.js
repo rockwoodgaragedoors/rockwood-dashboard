@@ -279,12 +279,28 @@ console.log('Monday boards:', JSON.stringify(data.data.boards.map(b => ({name: b
 function displayOrderStatusChart(items) {
     const statusCounts = {};
     
+    // Debug: Show first 5 items
+    console.log('First 5 items:', items.slice(0, 5).map(item => ({
+        name: item.name,
+        status: item.column_values.find(col => col.id === 'status')
+    })));
+    
     items.forEach(item => {
         // Find the status column value
         const statusColumn = item.column_values.find(col => col.id === 'status');
-        statusCounts[status] = (statusCounts[status] || 0) + 1;
+        const status = statusColumn?.text || 'Unknown';
+        if (status && status !== '') {  // Only count non-empty statuses
+            statusCounts[status] = (statusCounts[status] || 0) + 1;
+        }
     });
-   console.log('Status counts:', statusCounts);  // ADD THIS LINE
+
+    console.log('Status counts:', statusCounts);
+
+    // If no statuses found, show a message
+    if (Object.keys(statusCounts).length === 0) {
+        statusCounts['No Status Set'] = 1;
+    }
+
     const ctx = document.getElementById('orderStatusChart').getContext('2d');
     new Chart(ctx, {
         type: 'pie',
