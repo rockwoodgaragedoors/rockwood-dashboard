@@ -419,6 +419,8 @@ async function fetchAirIQVehicles() {
 }
 
 // Display vehicle locations
+// Display vehicle locations on map
+let vehicleMap = null;
 function displayVehicleLocations(vehicles) {
     const mapDiv = document.getElementById('vehicle-map');
     
@@ -426,32 +428,59 @@ function displayVehicleLocations(vehicles) {
         mapDiv.innerHTML = '<div style="color: #666;">No vehicles found</div>';
         return;
     }
-
-    // Create a list of vehicles with their locations
-    const vehicleHTML = vehicles.map(vehicle => {
-        const status = vehicle.status || {};
-        return `
-            <div style="background: rgba(255, 102, 26, 0.1); padding: 10px; margin: 5px; border-radius: 8px; border-left: 4px solid #ff661a;">
-                <div style="font-weight: bold; color: #ff661a;">${vehicle.name || 'Unknown Vehicle'}</div>
-                <div style="font-size: 14px; color: #ccc;">
-                    ${status.latitude && status.longitude ? 
-                        `Location: ${status.latitude.toFixed(4)}, ${status.longitude.toFixed(4)}` : 
-                        'Location unavailable'}
-                </div>
-                <div style="font-size: 14px; color: #888;">
-                    ${status.speed ? `Speed: ${status.speed} km/h` : ''}
-                    ${status.heading ? ` | Heading: ${status.heading}°` : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    mapDiv.innerHTML = `
-        <div style="height: 100%; overflow-y: auto;">
-            <div style="color: #ff661a; font-size: 16px; margin-bottom: 10px;">Fleet Vehicles (${vehicles.length})</div>
-            ${vehicleHTML}
-        </div>
-    `;
+    
+    // Clear any existing map
+    mapDiv.innerHTML = '';
+    
+    // Create map centered on Toronto area
+    vehicleMap = L.map('vehicle-map').setView([43.7, -79.4], 10);
+    
+    // Add map tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(vehicleMap);
+    
+    // Track bounds for all vehicles
+    const bounds = [];
+    let vehiclesWithLocation = 0;
+    
+    // Add markers for each vehicle
+    vehicles.forEach(vehicle => {
+        const status = vehicle.status || vehicle;
+        const lat = status.latitude || status.lat;
+        const lng = status.longitude || status.lng || status.lon;
+        const name = vehicle.name || status.name || 'Unknown Vehicle';
+        
+        if (lat && lng) {
+            vehiclesWithLocation++;
+            const marker = L.marker([lat, lng]).addTo(vehicleMap);
+            
+            // Create popup content
+            let popupContent = `<strong>${name}</strong><br/>`;
+            if (status.speed !== undefined) {
+                popupContent += `Speed: ${status.speed} km/h<br/>`;
+            }
+            if (status.heading !== undefined) {
+                popupContent += `Heading: ${status.heading}°<br/>`;
+            }
+            if (status.odometer !== undefined) {
+                popupContent += `Odometer: ${status.odometer} km<br/>`;
+            }
+            
+            marker.bindPopup(popupContent);
+            bounds.push([lat, lng]);
+        }
+    });
+    
+    // Fit map to show all vehicles
+    if (bounds.length > 0) {
+        vehicleMap.fitBounds(bounds, { padding: [50, 50] });
+    }
+    
+    // Add vehicle count to title
+    const vehicleCount = `${vehiclesWithLocation} of ${vehicles.length} vehicles with GPS`;
+    console.log(vehicleCount);
 }
 // Save and load notes
 function setupNotes() {
