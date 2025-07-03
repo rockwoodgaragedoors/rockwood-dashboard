@@ -50,24 +50,24 @@ async function fetchJobberJobs() {
             },
             body: JSON.stringify({
                 query: `
-                    query {
-                        visits(
-                            filter: {
-                                startAt: {
-                                    gte: "${today.toISOString().split('T')[0]}T00:00:00Z"
-                                    lte: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
-                                }
-                            }
-                            first: 50
-                        ) {
-                            nodes {
-                                startAt
-                                client { name }
-                                property { address { street1 city } }
-                            }
-                        }
-                    }
-                `
+    query {
+        visits(
+            filter: {
+                startAt: {
+                    min: "${today.toISOString().split('T')[0]}T00:00:00Z"
+                    max: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
+                }
+            }
+            first: 50
+        ) {
+            nodes {
+                startAt
+                client { name }
+                property { address { street1 city } }
+            }
+        }
+    }
+`
             })
         });
         
@@ -140,21 +140,23 @@ async function fetchJobberRevenue() {
             },
             body: JSON.stringify({
                 query: `
-                    query {
-                        invoices(
-                            filter: {
-                                createdAt: { gte: "${startOfLastYear.toISOString()}" }
-                                status: { in: [PAID, PARTIALLY_PAID] }
-                            }
-                            first: 1000
-                        ) {
-                            nodes {
-                                total { raw }
-                                createdAt
-                            }
-                        }
-                    }
-                `
+    query {
+        invoices(
+            filter: {
+                createdAt: {
+                    min: "${startOfLastYear.toISOString()}"
+                }
+                status: PAID
+            }
+            first: 1000
+        ) {
+            nodes {
+                total
+                createdAt
+            }
+        }
+    }
+`
             })
         });
         
@@ -192,7 +194,7 @@ function calculateAndDisplayRevenue(invoices) {
 
     invoices.forEach(invoice => {
         const invoiceDate = new Date(invoice.createdAt);
-        const amount = parseFloat(invoice.total.raw);
+        const amount = parseFloat(invoice.total);
 
         if (invoiceDate >= today) dailyRevenue += amount;
         if (invoiceDate >= weekStart) weeklyRevenue += amount;
