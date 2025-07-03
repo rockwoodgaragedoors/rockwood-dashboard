@@ -431,15 +431,15 @@ function displayVehicleLocations(vehicles) {
     // Clear any existing map
     mapDiv.innerHTML = '';
     
-    // Create container for map and legend
-    mapDiv.innerHTML = `
-        <div style="display: flex; height: 100%; gap: 10px;">
-            <div id="actual-map" style="flex: 1; height: 100%; border-radius: 10px;"></div>
-            <div id="map-legend" style="width: 200px; background: rgba(40, 40, 40, 0.8); border-radius: 10px; padding: 15px; overflow-y: auto;">
-                <div style="color: #ff661a; font-weight: bold; margin-bottom: 10px;">Vehicle Legend</div>
-            </div>
+  // Create container for map and legend
+mapDiv.innerHTML = `
+    <div style="position: relative; height: 100%; width: 100%;">
+        <div id="actual-map" style="position: absolute; top: 0; left: 0; right: 220px; bottom: 0; border-radius: 10px;"></div>
+        <div id="map-legend" style="position: absolute; top: 0; right: 0; width: 200px; bottom: 0; background: rgba(40, 40, 40, 0.8); border-radius: 10px; padding: 15px; overflow-y: auto;">
+            <div style="color: #ff661a; font-weight: bold; margin-bottom: 10px;">Vehicle Legend</div>
         </div>
-    `;
+    </div>
+`;
     
     // Wait for DOM to update
     setTimeout(() => {
