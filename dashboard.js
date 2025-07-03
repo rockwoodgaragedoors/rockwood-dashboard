@@ -441,7 +441,14 @@ function displayVehicleLocations(vehicles) {
             </div>
         </div>
     `;
+    // Wait for DOM to update
+setTimeout(() => {
+    // Create map
+    vehicleMap = L.map('actual-map').setView([43.7, -79.4], 10);
     
+    // ... rest of the function code ...
+    
+}, 100);
     // Create map
     vehicleMap = L.map('actual-map').setView([43.7, -79.4], 10);
     
