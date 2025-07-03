@@ -50,25 +50,24 @@ async function fetchJobberJobs() {
             },
             body: JSON.stringify({
                 query: `
-   query: `
-    query {
-        visits(
-            filter: {
-                startAt: {
-                    after: "${today.toISOString().split('T')[0]}T00:00:00Z"
-                    before: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
-                }
-            }
-            first: 50
-        ) {
-            nodes {
-                startAt
-                client { name }
-                property { address { street1 city } }
-            }
-        }
-    }
-`
+                    query {
+                        visits(
+                            filter: {
+                                startAt: {
+                                    after: "${today.toISOString().split('T')[0]}T00:00:00Z"
+                                    before: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
+                                }
+                            }
+                            first: 50
+                        ) {
+                            nodes {
+                                startAt
+                                client { name }
+                                property { address { street1 city } }
+                            }
+                        }
+                    }
+                `
             })
         });
         
