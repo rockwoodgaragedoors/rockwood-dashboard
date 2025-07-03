@@ -50,12 +50,13 @@ async function fetchJobberJobs() {
             },
             body: JSON.stringify({
                 query: `
+   query: `
     query {
         visits(
             filter: {
                 startAt: {
-                    min: "${today.toISOString().split('T')[0]}T00:00:00Z"
-                    max: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
+                    after: "${today.toISOString().split('T')[0]}T00:00:00Z"
+                    before: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
                 }
             }
             first: 50
@@ -140,13 +141,14 @@ async function fetchJobberRevenue() {
             },
             body: JSON.stringify({
                 query: `
+    query: `
     query {
         invoices(
             filter: {
                 createdAt: {
-                    min: "${startOfLastYear.toISOString()}"
+                    after: "${startOfLastYear.toISOString()}"
                 }
-                status: PAID
+                status: paid
             }
             first: 1000
         ) {
