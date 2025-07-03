@@ -432,8 +432,18 @@ function displayVehicleLocations(vehicles) {
     // Clear any existing map
     mapDiv.innerHTML = '';
     
-    // Create map centered on Toronto area
-    vehicleMap = L.map('vehicle-map').setView([43.7, -79.4], 10);
+    // Create container for map and legend
+    mapDiv.innerHTML = `
+        <div style="display: flex; height: 100%; gap: 10px;">
+            <div id="actual-map" style="flex: 1; height: 100%; border-radius: 10px;"></div>
+            <div id="map-legend" style="width: 200px; background: rgba(40, 40, 40, 0.8); border-radius: 10px; padding: 15px; overflow-y: auto;">
+                <div style="color: #ff661a; font-weight: bold; margin-bottom: 10px;">Vehicle Legend</div>
+            </div>
+        </div>
+    `;
+    
+    // Create map
+    vehicleMap = L.map('actual-map').setView([43.7, -79.4], 10);
     
     // Add map tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -441,29 +451,37 @@ function displayVehicleLocations(vehicles) {
         maxZoom: 19
     }).addTo(vehicleMap);
     
+    // Define colors for vehicles
+    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
+                   'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
+    
     // Track bounds for all vehicles
     const bounds = [];
     let vehiclesWithLocation = 0;
+    const legendDiv = document.getElementById('map-legend');
     
     // Add markers for each vehicle
-    vehicles.forEach(vehicle => {
+    vehicles.forEach((vehicle, index) => {
         const status = vehicle.status || vehicle;
         const lat = status.latitude || status.lat;
         const lng = status.longitude || status.lng || status.lon;
-        const name = vehicle.name || status.name || 'Unknown Vehicle';
+        const name = vehicle.name || status.name || `Vehicle ${index + 1}`;
+        const color = colors[index % colors.length];
         
         if (lat && lng) {
-    vehiclesWithLocation++;
-    
-    // Create a custom icon with the vehicle name
-    const vehicleIcon = L.divIcon({
-        className: 'vehicle-label',
-        html: `<div style="background: #ff661a; color: white; padding: 4px 8px; border-radius: 4px; white-space: nowrap; font-weight: bold; font-size: 12px;">${name}</div>`,
-        iconSize: [name.length * 8 + 16, 24],
-        iconAnchor: [(name.length * 8 + 16) / 2, 24]
-    });
-    
-    const marker = L.marker([lat, lng], { icon: vehicleIcon }).addTo(vehicleMap);
+            vehiclesWithLocation++;
+            
+            // Create colored marker icon
+            const markerIcon = new L.Icon({
+                iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+            
+            const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(vehicleMap);
             
             // Create popup content
             let popupContent = `<strong>${name}</strong><br/>`;
@@ -479,6 +497,14 @@ function displayVehicleLocations(vehicles) {
             
             marker.bindPopup(popupContent);
             bounds.push([lat, lng]);
+            
+            // Add to legend
+            legendDiv.innerHTML += `
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <div style="width: 20px; height: 20px; background-color: ${color}; border-radius: 50%; margin-right: 10px;"></div>
+                    <div style="color: #ccc; font-size: 14px;">${name}</div>
+                </div>
+            `;
         }
     });
     
@@ -486,25 +512,6 @@ function displayVehicleLocations(vehicles) {
     if (bounds.length > 0) {
         vehicleMap.fitBounds(bounds, { padding: [50, 50] });
     }
-    
-    // Add vehicle count to title
-    const vehicleCount = `${vehiclesWithLocation} of ${vehicles.length} vehicles with GPS`;
-    console.log(vehicleCount);
-}
-// Save and load notes
-function setupNotes() {
-    const notesArea = document.getElementById('notes-area');
-    
-    // Load saved notes
-    const savedNotes = localStorage.getItem('dashboard-notes');
-    if (savedNotes) {
-        notesArea.value = savedNotes;
-    }
-    
-    // Save notes on change
-    notesArea.addEventListener('input', () => {
-        localStorage.setItem('dashboard-notes', notesArea.value);
-    });
 }
 
 // Refresh all data
