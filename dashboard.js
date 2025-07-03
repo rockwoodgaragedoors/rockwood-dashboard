@@ -42,6 +42,7 @@ async function fetchJobberJobs() {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
         
+        console.log('Calling Jobber API...');
         const response = await fetch('/.netlify/functions/jobber', {
             method: 'POST',
             headers: {
@@ -69,12 +70,19 @@ async function fetchJobberJobs() {
                 `
             })
         });
-
+        
+        console.log('Jobber response status:', response.status);
+        if (!response.ok) {
+            console.error('Jobber response not OK:', await response.text());
+        }
+        
         const data = await response.json();
         console.log('Jobber response:', JSON.stringify(data, null, 2)); 
+        
         if (data.errors) {
-    console.error('Jobber GraphQL errors:', data.errors);
-}
+            console.error('Jobber GraphQL errors:', data.errors);
+        }
+        
         displayJobs(data.data.visits.nodes);
     } catch (error) {
         console.error('Error fetching Jobber jobs:', error);
@@ -124,6 +132,7 @@ async function fetchJobberRevenue() {
         const startOfLastYear = new Date(now.getFullYear() - 1, 0, 1);
         const endOfLastYear = new Date(now.getFullYear() - 1, 11, 31);
 
+        console.log('Calling Jobber API...');
         const response = await fetch('/.netlify/functions/jobber', {
             method: 'POST',
             headers: {
@@ -148,18 +157,24 @@ async function fetchJobberRevenue() {
                 `
             })
         });
-
+        
+        console.log('Jobber response status:', response.status);
+        if (!response.ok) {
+            console.error('Jobber response not OK:', await response.text());
+        }
+        
         const data = await response.json();
         console.log('Jobber revenue response:', JSON.stringify(data, null, 2));
+        
         if (data.errors) {
-    console.error('Jobber GraphQL errors:', data.errors);
-}
+            console.error('Jobber GraphQL errors:', data.errors);
+        }
+        
         calculateAndDisplayRevenue(data.data.invoices.nodes);
     } catch (error) {
         console.error('Error fetching revenue:', error);
     }
 }
-
 // Calculate and display revenue
 function calculateAndDisplayRevenue(invoices) {
     const now = new Date();
