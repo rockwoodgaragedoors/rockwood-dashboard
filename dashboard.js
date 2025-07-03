@@ -138,27 +138,26 @@ async function fetchJobberRevenue() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                query: `
+           body: JSON.stringify({
     query: `
-    query {
-        invoices(
-            filter: {
-                createdAt: {
-                    after: "${startOfLastYear.toISOString()}"
+        query {
+            invoices(
+                filter: {
+                    createdAt: {
+                        after: "${startOfLastYear.toISOString()}"
+                    }
+                    status: paid
                 }
-                status: paid
-            }
-            first: 1000
-        ) {
-            nodes {
-                total
-                createdAt
+                first: 1000
+            ) {
+                nodes {
+                    total
+                    createdAt
+                }
             }
         }
-    }
-`
-            })
+    `
+})
         });
         
         console.log('Jobber response status:', response.status);
