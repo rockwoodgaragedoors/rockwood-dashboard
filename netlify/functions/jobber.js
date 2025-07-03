@@ -27,15 +27,16 @@ exports.handler = async (event) => {
       const data = JSON.stringify({ query });
       
       const options = {
-        hostname: 'api.getjobber.com',
-        path: '/api/graphql',
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${JOBBER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'Content-Length': data.length
-        }
-      };
+  hostname: 'api.getjobber.com',
+  path: '/api/graphql',
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${JOBBER_API_KEY}`,
+    'Content-Type': 'application/json',
+    'Content-Length': data.length,
+    'X-JOBBER-GRAPHQL-VERSION': '2024-01-10'
+  }
+};
       
       const req = https.request(options, (res) => {
         let responseData = '';
