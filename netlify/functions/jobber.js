@@ -34,7 +34,7 @@ exports.handler = async (event) => {
     'Authorization': `Bearer ${JOBBER_API_KEY}`,
     'Content-Type': 'application/json',
     'Content-Length': data.length,
-    'X-JOBBER-GRAPHQL-VERSION': '2024-01-10'
+    'X-JOBBER-GRAPHQL-VERSION': '2025-01-20'
   }
 };
       
