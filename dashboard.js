@@ -418,7 +418,6 @@ async function fetchAirIQVehicles() {
     }
 }
 
-// Display vehicle locations
 // Display vehicle locations on map
 let vehicleMap = null;
 function displayVehicleLocations(vehicles) {
@@ -441,84 +440,80 @@ function displayVehicleLocations(vehicles) {
             </div>
         </div>
     `;
+    
     // Wait for DOM to update
-setTimeout(() => {
-    // Create map
-    vehicleMap = L.map('actual-map').setView([43.7, -79.4], 10);
-    
-    // ... rest of the function code ...
-    
-}, 100);
-    // Create map
-    vehicleMap = L.map('actual-map').setView([43.7, -79.4], 10);
-    
-    // Add map tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
-    }).addTo(vehicleMap);
-    
-    // Define colors for vehicles
-    const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
-                   'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
-    
-    // Track bounds for all vehicles
-    const bounds = [];
-    let vehiclesWithLocation = 0;
-    const legendDiv = document.getElementById('map-legend');
-    
-    // Add markers for each vehicle
-    vehicles.forEach((vehicle, index) => {
-        const status = vehicle.status || vehicle;
-        const lat = status.latitude || status.lat;
-        const lng = status.longitude || status.lng || status.lon;
-        const name = vehicle.name || status.name || `Vehicle ${index + 1}`;
-        const color = colors[index % colors.length];
+    setTimeout(() => {
+        // Create map
+        vehicleMap = L.map('actual-map').setView([43.7, -79.4], 10);
         
-        if (lat && lng) {
-            vehiclesWithLocation++;
+        // Add map tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(vehicleMap);
+        
+        // Define colors for vehicles
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
+                       'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
+        
+        // Track bounds for all vehicles
+        const bounds = [];
+        let vehiclesWithLocation = 0;
+        const legendDiv = document.getElementById('map-legend');
+        
+        // Add markers for each vehicle
+        vehicles.forEach((vehicle, index) => {
+            const status = vehicle.status || vehicle;
+            const lat = status.latitude || status.lat;
+            const lng = status.longitude || status.lng || status.lon;
+            const name = vehicle.name || status.name || `Vehicle ${index + 1}`;
+            const color = colors[index % colors.length];
             
-            // Create colored marker icon
-            const markerIcon = new L.Icon({
-                iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                shadowSize: [41, 41]
-            });
-            
-            const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(vehicleMap);
-            
-            // Create popup content
-            let popupContent = `<strong>${name}</strong><br/>`;
-            if (status.speed !== undefined) {
-                popupContent += `Speed: ${status.speed} km/h<br/>`;
+            if (lat && lng) {
+                vehiclesWithLocation++;
+                
+                // Create colored marker icon
+                const markerIcon = new L.Icon({
+                    iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+                
+                const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(vehicleMap);
+                
+                // Create popup content
+                let popupContent = `<strong>${name}</strong><br/>`;
+                if (status.speed !== undefined) {
+                    popupContent += `Speed: ${status.speed} km/h<br/>`;
+                }
+                if (status.heading !== undefined) {
+                    popupContent += `Heading: ${status.heading}°<br/>`;
+                }
+                if (status.odometer !== undefined) {
+                    popupContent += `Odometer: ${status.odometer} km<br/>`;
+                }
+                
+                marker.bindPopup(popupContent);
+                bounds.push([lat, lng]);
+                
+                // Add to legend
+                legendDiv.innerHTML += `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <div style="width: 20px; height: 20px; background-color: ${color}; border-radius: 50%; margin-right: 10px;"></div>
+                        <div style="color: #ccc; font-size: 14px;">${name}</div>
+                    </div>
+                `;
             }
-            if (status.heading !== undefined) {
-                popupContent += `Heading: ${status.heading}°<br/>`;
-            }
-            if (status.odometer !== undefined) {
-                popupContent += `Odometer: ${status.odometer} km<br/>`;
-            }
-            
-            marker.bindPopup(popupContent);
-            bounds.push([lat, lng]);
-            
-            // Add to legend
-            legendDiv.innerHTML += `
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                    <div style="width: 20px; height: 20px; background-color: ${color}; border-radius: 50%; margin-right: 10px;"></div>
-                    <div style="color: #ccc; font-size: 14px;">${name}</div>
-                </div>
-            `;
+        });
+        
+        // Fit map to show all vehicles
+        if (bounds.length > 0) {
+            vehicleMap.fitBounds(bounds, { padding: [50, 50] });
         }
-    });
-    
-    // Fit map to show all vehicles
-    if (bounds.length > 0) {
-        vehicleMap.fitBounds(bounds, { padding: [50, 50] });
-    }
+    }, 100);
 }
 // Save and load notes
 function setupNotes() {
