@@ -513,7 +513,21 @@ function displayVehicleLocations(vehicles) {
         vehicleMap.fitBounds(bounds, { padding: [50, 50] });
     }
 }
-
+// Save and load notes
+function setupNotes() {
+    const notesArea = document.getElementById('notes-area');
+    
+    // Load saved notes
+    const savedNotes = localStorage.getItem('dashboard-notes');
+    if (savedNotes) {
+        notesArea.value = savedNotes;
+    }
+    
+    // Save notes on change
+    notesArea.addEventListener('input', () => {
+        localStorage.setItem('dashboard-notes', notesArea.value);
+    });
+}
 // Refresh all data
 function refreshAllData() {
     fetchJobberJobs();
