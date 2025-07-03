@@ -13,7 +13,7 @@ exports.handler = async (event) => {
   // You'll need to add these to your Netlify environment variables
   const CLIENT_ID = process.env.JOBBER_CLIENT_ID;
   const CLIENT_SECRET = process.env.JOBBER_CLIENT_SECRET;
-  const REDIRECT_URI = 'https://rockwoodgaragedoors.netlify.app/.netlify/functions/jobber-callback';
+  const REDIRECT_URI = 'https://rgddash.netlify.app/.netlify/functions/jobber-callback';
 
   try {
     // Exchange code for tokens
