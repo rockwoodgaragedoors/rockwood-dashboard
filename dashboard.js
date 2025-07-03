@@ -72,6 +72,9 @@ async function fetchJobberJobs() {
 
         const data = await response.json();
         console.log('Jobber response:', JSON.stringify(data, null, 2)); 
+        if (data.errors) {
+    console.error('Jobber GraphQL errors:', data.errors);
+}
         displayJobs(data.data.visits.nodes);
     } catch (error) {
         console.error('Error fetching Jobber jobs:', error);
@@ -148,6 +151,9 @@ async function fetchJobberRevenue() {
 
         const data = await response.json();
         console.log('Jobber revenue response:', JSON.stringify(data, null, 2));
+        if (data.errors) {
+    console.error('Jobber GraphQL errors:', data.errors);
+}
         calculateAndDisplayRevenue(data.data.invoices.nodes);
     } catch (error) {
         console.error('Error fetching revenue:', error);
