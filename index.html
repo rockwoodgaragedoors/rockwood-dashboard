@@ -17,8 +17,6 @@
             color: #ffffff;
             height: 100vh;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
         /* Header - Compact */
@@ -29,7 +27,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            flex-shrink: 0;
+            height: 60px;
         }
 
         .header-left {
@@ -64,16 +62,21 @@
             color: #999;
         }
 
-        /* Main Grid - Optimized for 3440x1440 */
+        /* Main Container */
+        .main-container {
+            height: calc(100vh - 60px);
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        /* Dashboard Grid - Fixed for ultrawide */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            grid-template-rows: auto auto 1fr;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 15px;
-            padding: 15px;
-            height: calc(100vh - 70px);
-            max-width: 3440px;
-            margin: 0 auto;
+            height: 100%;
+            max-width: 100%;
         }
 
         .tile {
@@ -84,6 +87,7 @@
             display: flex;
             flex-direction: column;
             border: 1px solid #2a2a2a;
+            overflow: hidden;
         }
 
         .tile-header {
@@ -92,13 +96,28 @@
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            flex-shrink: 0;
         }
 
-        /* Revenue Tiles - Row 1 */
-        .revenue-tile {
-            grid-row: 1;
+        /* Grid positioning */
+        .daily-revenue { grid-column: 1; grid-row: 1; }
+        .weekly-revenue { grid-column: 2; grid-row: 1; }
+        .monthly-revenue { grid-column: 3; grid-row: 1; }
+        
+        .calls-today { grid-column: 1; grid-row: 2; }
+        .missed-calls { grid-column: 2; grid-row: 2; }
+        .ytd-stats { grid-column: 3; grid-row: 2; }
+        
+        .jobs-tile { grid-column: 1; grid-row: 3; }
+        .order-status-tile { grid-column: 2; grid-row: 3; }
+        .map-tile { grid-column: 3; grid-row: 3; }
+        
+        .notes-tile { 
+            grid-column: 4; 
+            grid-row: 1 / 4; 
         }
 
+        /* Revenue styling */
         .revenue-amount {
             font-size: 28px;
             font-weight: 600;
@@ -134,14 +153,13 @@
             color: #f87171;
         }
 
-        /* Stats Tiles - Row 2 */
-        .stats-tile {
-            grid-row: 2;
+        /* Stats styling */
+        .stats-content {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100px;
+            flex: 1;
         }
 
         .stats-value {
@@ -157,30 +175,45 @@
             margin-top: 5px;
         }
 
-        /* Large Content Tiles - Row 3 */
-        .jobs-tile {
-            grid-column: 1;
-            grid-row: 3;
+        /* YTD Stats special styling */
+        .ytd-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+            gap: 10px;
         }
 
-        .order-status-tile {
-            grid-column: 2;
-            grid-row: 3;
+        .ytd-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .map-tile {
-            grid-column: 3;
-            grid-row: 3;
+        .ytd-label {
+            font-size: 14px;
+            color: #999;
         }
 
-        .notes-tile {
-            grid-column: 4;
-            grid-row: 1 / 4;
+        .ytd-value {
+            font-size: 18px;
+            font-weight: 600;
         }
 
         /* Jobs styling */
+        .jobs-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
         .jobs-section {
-            margin-bottom: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+            overflow: hidden;
         }
 
         .jobs-section h4 {
@@ -188,11 +221,12 @@
             color: #ff6b35;
             margin-bottom: 8px;
             text-transform: uppercase;
+            flex-shrink: 0;
         }
 
         .jobs-list {
-            max-height: 200px;
             overflow-y: auto;
+            flex: 1;
         }
 
         .job-item {
@@ -224,7 +258,7 @@
         .chart-container {
             flex: 1;
             position: relative;
-            min-height: 200px;
+            min-height: 0;
         }
 
         /* Map container */
@@ -232,10 +266,10 @@
             flex: 1;
             border-radius: 8px;
             overflow: hidden;
-            min-height: 300px;
+            min-height: 0;
         }
 
-        /* Notes */
+        /* Notes/Shit List */
         #notes-area {
             flex: 1;
             background-color: #252525;
@@ -277,186 +311,80 @@
             background: #444;
         }
 
-        /* Responsive adjustments for different ultrawides */
-        @media (max-width: 2560px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .notes-tile {
-                grid-column: 3;
-                grid-row: 1 / 4;
-            }
-            
-            .map-tile {
-                grid-column: 2 / 4;
-                grid-row: 4;
-                height: 300px;
-            }
-            
-            .order-status-tile {
-                grid-column: 1;
-                grid-row: 4;
-            }
-        }
-
-        /* Tablet view */
-        @media (max-width: 1024px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: auto;
-                gap: 10px;
-                padding: 10px;
-            }
-            
-            .tile {
-                grid-column: span 1 !important;
-                grid-row: auto !important;
-            }
-            
-            .map-tile {
-                grid-column: span 2 !important;
-                height: 300px;
-            }
-            
-            .notes-tile {
-                grid-column: span 2 !important;
-                height: 200px;
-            }
-            
-            .order-status-tile {
-                height: 300px;
-            }
-        }
-
-        /* Mobile view */
+        /* Mobile responsive */
         @media (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
-            
             .header {
                 padding: 8px 15px;
+                height: auto;
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .header-left {
                 width: 100%;
                 justify-content: space-between;
             }
-            
+
             .logo {
                 height: 30px;
             }
-            
+
             .company-name {
                 font-size: 18px;
             }
-            
+
             .datetime {
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
             }
-            
+
             .time {
                 font-size: 18px;
             }
-            
-            .date {
-                font-size: 12px;
+
+            .main-container {
+                height: auto;
+                padding: 10px;
+                overflow-y: auto;
             }
-            
+
             .dashboard-grid {
                 display: flex;
                 flex-direction: column;
-                height: auto;
-                padding: 10px;
                 gap: 10px;
+                height: auto;
             }
-            
+
             .tile {
                 width: 100%;
-                min-height: auto;
-            }
-            
-            /* Mobile-specific tile heights */
-            .revenue-tile {
-                min-height: 90px;
-            }
-            
-            .stats-tile {
                 min-height: 100px;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: 20px;
             }
-            
+
+            .revenue-amount {
+                font-size: 24px;
+            }
+
             .stats-value {
                 font-size: 28px;
             }
-            
-            .revenue-amount {
-                font-size: 24px;
-            }
-            
+
             .jobs-tile {
-                max-height: 400px;
+                height: 300px;
             }
-            
-            .jobs-list {
-                max-height: 150px;
-            }
-            
+
             .order-status-tile {
                 height: 300px;
             }
-            
-            .chart-container {
-                min-height: 250px;
-            }
-            
+
             .map-tile {
                 height: 300px;
             }
-            
+
             .notes-tile {
                 height: 200px;
-                order: 999; /* Put shit list at the bottom on mobile */
-            }
-            
-            /* Order tiles for mobile */
-            .revenue-tile:nth-child(1) { order: 1; }
-            .revenue-tile:nth-child(2) { order: 2; }
-            .revenue-tile:nth-child(3) { order: 3; }
-            .stats-tile:nth-child(4) { order: 4; }
-            .stats-tile:nth-child(5) { order: 5; }
-            .stats-tile:nth-child(6) { order: 6; }
-            .jobs-tile { order: 7; }
-            .order-status-tile { order: 8; }
-            .map-tile { order: 9; }
-            .notes-tile { order: 10; }
-        }
-
-        /* Extra small mobile */
-        @media (max-width: 375px) {
-            .revenue-amount {
-                font-size: 20px;
-            }
-            
-            .stats-value {
-                font-size: 24px;
-            }
-            
-            .tile {
-                padding: 12px;
-            }
-            
-            .tile-header {
-                font-size: 12px;
+                order: 999;
             }
         }
     </style>
@@ -465,7 +393,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-    <!-- Compact Header -->
+    <!-- Header -->
     <div class="header">
         <div class="header-left">
             <img src="RGD- Transparent.jpg" alt="RGD Logo" class="logo">
@@ -477,89 +405,100 @@
         </div>
     </div>
 
-    <!-- Main Dashboard Grid -->
-    <div class="dashboard-grid">
-        <!-- Revenue Tiles - Row 1 -->
-        <div class="tile revenue-tile">
-            <div class="tile-header">Daily Revenue</div>
-            <div class="revenue-amount" id="daily-revenue">$0</div>
-            <div class="revenue-vs-bep">
-                <span class="bep-amount">BEP: $2,917</span>
-                <span class="revenue-difference" id="daily-diff">$0</span>
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="dashboard-grid">
+            <!-- Revenue Tiles - Row 1 -->
+            <div class="tile daily-revenue">
+                <div class="tile-header">Daily Revenue</div>
+                <div class="revenue-amount" id="daily-revenue">$0</div>
+                <div class="revenue-vs-bep">
+                    <span class="bep-amount">BEP: $2,917</span>
+                    <span class="revenue-difference" id="daily-diff">$0</span>
+                </div>
             </div>
-        </div>
 
-        <div class="tile revenue-tile">
-            <div class="tile-header">Weekly Revenue</div>
-            <div class="revenue-amount" id="weekly-revenue">$0</div>
-            <div class="revenue-vs-bep">
-                <span class="bep-amount">BEP: $14,585</span>
-                <span class="revenue-difference" id="weekly-diff">$0</span>
+            <div class="tile weekly-revenue">
+                <div class="tile-header">Weekly Revenue</div>
+                <div class="revenue-amount" id="weekly-revenue">$0</div>
+                <div class="revenue-vs-bep">
+                    <span class="bep-amount">BEP: $14,585</span>
+                    <span class="revenue-difference" id="weekly-diff">$0</span>
+                </div>
             </div>
-        </div>
 
-        <div class="tile revenue-tile">
-            <div class="tile-header">Monthly Revenue</div>
-            <div class="revenue-amount" id="monthly-revenue">$0</div>
-            <div class="revenue-vs-bep">
-                <span class="bep-amount">BEP: $62,706</span>
-                <span class="revenue-difference" id="monthly-diff">$0</span>
+            <div class="tile monthly-revenue">
+                <div class="tile-header">Monthly Revenue</div>
+                <div class="revenue-amount" id="monthly-revenue">$0</div>
+                <div class="revenue-vs-bep">
+                    <span class="bep-amount">BEP: $62,706</span>
+                    <span class="revenue-difference" id="monthly-diff">$0</span>
+                </div>
             </div>
-        </div>
 
-        <!-- Stats Tiles - Row 2 -->
-        <div class="tile stats-tile">
-            <div class="stats-value" id="call-volume">—</div>
-            <div class="stats-label">Calls Today</div>
-        </div>
-
-        <div class="tile stats-tile">
-            <div class="stats-value" id="missed-calls">—</div>
-            <div class="stats-label">Missed Calls</div>
-        </div>
-
-        <div class="tile stats-tile">
-            <div>
-                <div style="font-size: 16px; color: #999;">YTD Previous</div>
-                <div style="font-size: 20px; font-weight: 600;" id="ytd-previous">$0</div>
+            <!-- Stats Tiles - Row 2 -->
+            <div class="tile calls-today">
+                <div class="tile-header">Call Stats</div>
+                <div class="stats-content">
+                    <div class="stats-value" id="call-volume">—</div>
+                    <div class="stats-label">Calls Today</div>
+                </div>
             </div>
-            <div style="margin-top: 10px;">
-                <div style="font-size: 16px; color: #ff6b35;">YTD Current</div>
-                <div style="font-size: 20px; font-weight: 600;" id="ytd-current">$0</div>
-            </div>
-        </div>
 
-        <!-- Notes - Spans rows 1, 2, and 3 -->
-        <div class="tile notes-tile">
-            <div class="tile-header" style="color: #ff6b35;">Shit List</div>
-            <textarea id="notes-area" placeholder="Enter notes here..."></textarea>
-        </div>
-
-        <!-- Jobs Tile -->
-        <div class="tile jobs-tile">
-            <div class="tile-header">Scheduled Jobs</div>
-            <div class="jobs-section">
-                <h4>Today</h4>
-                <div class="jobs-list" id="today-jobs">Loading...</div>
+            <div class="tile missed-calls">
+                <div class="tile-header">Missed</div>
+                <div class="stats-content">
+                    <div class="stats-value" id="missed-calls">—</div>
+                    <div class="stats-label">Missed Calls</div>
+                </div>
             </div>
-            <div class="jobs-section">
-                <h4>Tomorrow</h4>
-                <div class="jobs-list" id="tomorrow-jobs">Loading...</div>
-            </div>
-        </div>
 
-        <!-- Order Status Chart -->
-        <div class="tile order-status-tile">
-            <div class="tile-header">Order Status</div>
-            <div class="chart-container">
-                <canvas id="orderStatusChart"></canvas>
+            <div class="tile ytd-stats">
+                <div class="tile-header">Year to Date</div>
+                <div class="ytd-content">
+                    <div class="ytd-item">
+                        <span class="ytd-label">YTD Previous</span>
+                        <span class="ytd-value" id="ytd-previous">$0</span>
+                    </div>
+                    <div class="ytd-item">
+                        <span class="ytd-label" style="color: #ff6b35;">YTD Current</span>
+                        <span class="ytd-value" style="color: #ff6b35;" id="ytd-current">$0</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- Vehicle Map -->
-        <div class="tile map-tile">
-            <div class="tile-header">Vehicle Locations</div>
-            <div id="vehicle-map"></div>
+            <!-- Large Tiles - Row 3 -->
+            <div class="tile jobs-tile">
+                <div class="tile-header">Scheduled Jobs</div>
+                <div class="jobs-content">
+                    <div class="jobs-section">
+                        <h4>Today</h4>
+                        <div class="jobs-list" id="today-jobs">Loading...</div>
+                    </div>
+                    <div class="jobs-section">
+                        <h4>Tomorrow</h4>
+                        <div class="jobs-list" id="tomorrow-jobs">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tile order-status-tile">
+                <div class="tile-header">Order Status</div>
+                <div class="chart-container">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="tile map-tile">
+                <div class="tile-header">Vehicle Locations</div>
+                <div id="vehicle-map"></div>
+            </div>
+
+            <!-- Shit List - Spans all rows -->
+            <div class="tile notes-tile">
+                <div class="tile-header" style="color: #ff6b35;">Shit List</div>
+                <textarea id="notes-area" placeholder="Enter notes here..."></textarea>
+            </div>
         </div>
     </div>
 
