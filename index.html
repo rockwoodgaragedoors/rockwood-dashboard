@@ -73,7 +73,7 @@
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(3, 1fr);
+            grid-template-rows: 120px 120px 1fr;
             gap: 15px;
             height: 100%;
             max-width: 100%;
@@ -276,7 +276,8 @@
             border: 1px solid #333;
             color: #666;
             padding: 10px;
-            font-size: 14px;
+            font-size: 18px;
+            line-height: 1.5;
             resize: none;
             border-radius: 6px;
             transition: color 0.3s ease;
@@ -313,11 +314,19 @@
 
         /* Mobile responsive */
         @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
             .header {
                 padding: 8px 15px;
                 height: auto;
                 flex-direction: column;
                 gap: 10px;
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
 
             .header-left {
@@ -347,7 +356,7 @@
             .main-container {
                 height: auto;
                 padding: 10px;
-                overflow-y: auto;
+                overflow-y: visible;
             }
 
             .dashboard-grid {
