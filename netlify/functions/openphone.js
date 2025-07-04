@@ -20,7 +20,8 @@ exports.handler = async (event) => {
   }
   
   try {
-    const { startTime, phoneNumberId } = JSON.parse(event.body);
+    const requestBody = JSON.parse(event.body);
+    const { startTime, phoneNumberId, participants } = requestBody;
     
     // If no phoneNumberId provided, we need to get the phone numbers first
     if (!phoneNumberId) {
@@ -65,18 +66,19 @@ exports.handler = async (event) => {
     
     // If we have phoneNumberId, get the calls
     return new Promise((resolve) => {
-      // Get the phone number from the request body or use Primary as default
-      const primaryPhoneNumber = '+12892706559'; // Primary line in E.164 format
-      
       // Build query parameters - OpenPhone API uses query params for GET requests
       const params = new URLSearchParams();
       
       // Required parameters
       params.append('phoneNumberId', phoneNumberId);
       
-      // Participants MUST contain at least one phone number in E.164 format
-      // Since we're tracking the Primary line, we'll use its number
-      params.append('participants', JSON.stringify([primaryPhoneNumber]));
+      // Add participants if provided - each participant needs to be added separately
+      if (participants && participants.length > 0) {
+        participants.forEach(participant => {
+          params.append('participants', participant);
+        });
+      }
+      // If no participants provided, we'll try without the parameter
       
       // Date filters
       const now = new Date();
