@@ -12,485 +12,557 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: #1a1a1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0a0a0a;
             color: #ffffff;
+            height: 100vh;
             overflow: hidden;
-            height: 100vh;
-        }
-
-        .dashboard {
-            height: 100vh;
-            padding: 20px;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            gap: 20px;
-        }
-
-        .header {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-            padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(255, 102, 26, 0.3);
+            flex-direction: column;
         }
 
-        .logo-section {
+        /* Header - Compact */
+        .header {
+            background-color: #1a1a1a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        .header-left {
             display: flex;
             align-items: center;
             gap: 20px;
         }
 
         .logo {
-            height: 60px;
+            height: 40px;
+            width: auto;
         }
 
         .company-name {
-            font-size: 32px;
-            font-weight: bold;
-            color: #ff661a;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff6b35;
         }
 
         .datetime {
             text-align: right;
         }
 
-        .date {
+        .time {
             font-size: 24px;
-            color: #ff661a;
+            font-weight: 300;
+            color: #ff6b35;
+        }
+
+        .date {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* Main Grid - Optimized for 3440x1440 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-rows: auto auto 1fr;
+            gap: 15px;
+            padding: 15px;
+            height: calc(100vh - 70px);
+            max-width: 3440px;
+            margin: 0 auto;
+        }
+
+        .tile {
+            background-color: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #2a2a2a;
+        }
+
+        .tile-header {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Revenue Tiles - Row 1 */
+        .revenue-tile {
+            grid-row: 1;
+        }
+
+        .revenue-amount {
+            font-size: 28px;
+            font-weight: 600;
+            color: #fff;
             margin-bottom: 5px;
         }
 
-        .time {
-            font-size: 36px;
-            font-weight: bold;
-            color: #ffffff;
-        }
-
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr;
-            gap: 20px;
-            height: 100%;
-        }
-
-        .widget {
-            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .widget:hover {
-            border-color: #ff661a;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(255, 102, 26, 0.4);
-        }
-
-        .widget-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: #ff661a;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .widget-icon {
-            width: 30px;
-            height: 30px;
-            background: #ff661a;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Jobber Jobs Widget */
-        .jobs-widget {
-            grid-column: span 1;
-        }
-
-        .jobs-section {
-            margin-bottom: 20px;
-        }
-
-        .jobs-section h3 {
-            color: #888;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .job-item {
-            background: rgba(255, 102, 26, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 4px solid #ff661a;
-        }
-
-        .job-time {
+        .revenue-vs-bep {
             font-size: 14px;
-            color: #ff661a;
-            font-weight: bold;
-        }
-
-        .job-customer {
-            font-size: 16px;
-            color: #fff;
-            margin-top: 4px;
-        }
-
-        .job-address {
-            font-size: 13px;
-            color: #888;
-            margin-top: 2px;
-        }
-
-        /* Revenue Widget */
-        .revenue-widget {
-            grid-column: span 1;
-        }
-
-        .revenue-item {
-            background: rgba(40, 40, 40, 0.6);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 5px;
         }
 
-        .revenue-label {
-            font-size: 16px;
-            color: #888;
+        .bep-amount {
+            color: #666;
         }
 
-        .revenue-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
+        .revenue-difference {
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
         }
 
-        .revenue-comparison {
-            font-size: 14px;
-            margin-top: 5px;
+        .revenue-difference.positive {
+            background-color: rgba(52, 211, 153, 0.2);
+            color: #34d399;
         }
 
-        .positive {
-            color: #4ade80;
-        }
-
-        .negative {
+        .revenue-difference.negative {
+            background-color: rgba(248, 113, 113, 0.2);
             color: #f87171;
         }
 
-        /* Phone Stats Widget */
-        .phone-widget {
+        /* Stats Tiles - Row 2 */
+        .stats-tile {
+            grid-row: 2;
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 100px;
         }
 
-        .phone-stat {
-            text-align: center;
-            flex: 1;
-            min-width: 120px;
+        .stats-value {
+            font-size: 36px;
+            font-weight: 600;
+            color: #ff6b35;
         }
 
-        .phone-stat-value {
-            font-size: 48px;
-            font-weight: bold;
-            color: #ff661a;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .phone-stat-label {
-            font-size: 16px;
-            color: #888;
+        .stats-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
             margin-top: 5px;
         }
 
-        /* Monday.com Chart Widget */
-        .chart-container {
-            width: 100%;
-            height: calc(100% - 50px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Large Content Tiles - Row 3 */
+        .jobs-tile {
+            grid-column: 1;
+            grid-row: 3;
         }
 
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
+        .order-status-tile {
+            grid-column: 2;
+            grid-row: 3;
         }
 
-        /* Vehicle Map Widget */
-        .vehicle-widget {
-    grid-column: span 2;
-    grid-row: span 2;
-}
+        .map-tile {
+            grid-column: 3;
+            grid-row: 3;
+        }
 
-       .map-placeholder {
-    width: 100%;
-    height: calc(100% - 50px);
-    background: #1a1a1a;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
-    font-size: 18px;
-}
+        .notes-tile {
+            grid-column: 4;
+            grid-row: 1 / 4;
+        }
 
-#vehicle-map {
-    width: 100%;
-    height: calc(100% - 50px);
-    border-radius: 10px;
-    position: relative;
-}
+        /* Jobs styling */
+        .jobs-section {
+            margin-bottom: 15px;
+        }
 
-#actual-map {
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 200px;
-    bottom: 0;
-    border-radius: 10px;
-}
+        .jobs-section h4 {
+            font-size: 12px;
+            color: #ff6b35;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
 
-        /* Notes Widget */
-    .notes-widget {
-    grid-row: span 2;
-}
-        .notes-content {
-            width: 100%;
-            height: calc(100% - 50px);
-            background: rgba(40, 40, 40, 0.6);
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 15px;
+        .jobs-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .job-item {
+            background-color: #252525;
+            padding: 8px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            font-size: 12px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        .job-time {
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .job-customer {
             color: #fff;
-            font-size: 16px;
-            resize: none;
-            font-family: inherit;
+            margin: 2px 0;
         }
 
-        .notes-content:focus {
-            outline: none;
-            border-color: #ff661a;
-        }
-
-        /* YTD Revenue Widget */
-        .ytd-widget {
-            grid-column: span 1;
-        }
-
-        .ytd-comparison {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: calc(100% - 50px);
-        }
-
-        .ytd-item {
-            flex: 1;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .ytd-year {
-            font-size: 18px;
+        .job-address {
             color: #888;
-            margin-bottom: 10px;
+            font-size: 11px;
         }
 
-        .ytd-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #ff661a;
+        /* Chart container */
+        .chart-container {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
         }
 
-        .ytd-divider {
-            width: 2px;
-            height: 80%;
+        /* Map container */
+        #vehicle-map {
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            min-height: 300px;
+        }
+
+        /* Notes */
+        #notes-area {
+            flex: 1;
+            background-color: #252525;
+            border: 1px solid #333;
+            color: #666;
+            padding: 10px;
+            font-size: 14px;
+            resize: none;
+            border-radius: 6px;
+            transition: color 0.3s ease;
+        }
+
+        #notes-area:not(:placeholder-shown) {
+            color: #ff6b35;
+            font-weight: 500;
+        }
+
+        #notes-area:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
             background: #444;
         }
 
-        /* Loading animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 102, 26, 0.3);
-            border-radius: 50%;
-            border-top-color: #ff661a;
-            animation: spin 1s ease-in-out infinite;
+        /* Responsive adjustments for different ultrawides */
+        @media (max-width: 2560px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .notes-tile {
+                grid-column: 3;
+                grid-row: 1 / 4;
+            }
+            
+            .map-tile {
+                grid-column: 2 / 4;
+                grid-row: 4;
+                height: 300px;
+            }
+            
+            .order-status-tile {
+                grid-column: 1;
+                grid-row: 4;
+            }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Tablet view */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: auto;
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .tile {
+                grid-column: span 1 !important;
+                grid-row: auto !important;
+            }
+            
+            .map-tile {
+                grid-column: span 2 !important;
+                height: 300px;
+            }
+            
+            .notes-tile {
+                grid-column: span 2 !important;
+                height: 200px;
+            }
+            
+            .order-status-tile {
+                height: 300px;
+            }
         }
 
-        /* Responsive adjustments for different TV sizes */
-        @media (max-width: 1920px) {
-            .widget-title { font-size: 20px; }
-            .time { font-size: 32px; }
-            .date { font-size: 22px; }
+        /* Mobile view */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .header {
+                padding: 8px 15px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .logo {
+                height: 30px;
+            }
+            
+            .company-name {
+                font-size: 18px;
+            }
+            
+            .datetime {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .time {
+                font-size: 18px;
+            }
+            
+            .date {
+                font-size: 12px;
+            }
+            
+            .dashboard-grid {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .tile {
+                width: 100%;
+                min-height: auto;
+            }
+            
+            /* Mobile-specific tile heights */
+            .revenue-tile {
+                min-height: 90px;
+            }
+            
+            .stats-tile {
+                min-height: 100px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px;
+            }
+            
+            .stats-value {
+                font-size: 28px;
+            }
+            
+            .revenue-amount {
+                font-size: 24px;
+            }
+            
+            .jobs-tile {
+                max-height: 400px;
+            }
+            
+            .jobs-list {
+                max-height: 150px;
+            }
+            
+            .order-status-tile {
+                height: 300px;
+            }
+            
+            .chart-container {
+                min-height: 250px;
+            }
+            
+            .map-tile {
+                height: 300px;
+            }
+            
+            .notes-tile {
+                height: 200px;
+                order: 999; /* Put shit list at the bottom on mobile */
+            }
+            
+            /* Order tiles for mobile */
+            .revenue-tile:nth-child(1) { order: 1; }
+            .revenue-tile:nth-child(2) { order: 2; }
+            .revenue-tile:nth-child(3) { order: 3; }
+            .stats-tile:nth-child(4) { order: 4; }
+            .stats-tile:nth-child(5) { order: 5; }
+            .stats-tile:nth-child(6) { order: 6; }
+            .jobs-tile { order: 7; }
+            .order-status-tile { order: 8; }
+            .map-tile { order: 9; }
+            .notes-tile { order: 10; }
+        }
+
+        /* Extra small mobile */
+        @media (max-width: 375px) {
+            .revenue-amount {
+                font-size: 20px;
+            }
+            
+            .stats-value {
+                font-size: 24px;
+            }
+            
+            .tile {
+                padding: 12px;
+            }
+            
+            .tile-header {
+                font-size: 12px;
+            }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-    <div class="dashboard">
-        <div class="header">
-            <div class="logo-section">
-                <img src="RGD- Transparent.jpg" alt="Rockwood Garage Doors" class="logo">
-                <div class="company-name">Dashboard</div>
-            </div>
-            <div class="datetime">
-                <div class="date" id="current-date"></div>
-                <div class="time" id="current-time"></div>
-            </div>
+    <!-- Compact Header -->
+    <div class="header">
+        <div class="header-left">
+            <img src="RGD- Transparent.jpg" alt="RGD Logo" class="logo">
+            <div class="company-name">Rockwood Garage Doors</div>
         </div>
-
-        <div class="main-content">
-            <!-- Today's & Tomorrow's Jobs -->
-            <div class="widget jobs-widget">
-                <div class="widget-title">
-                    <div class="widget-icon">📅</div>
-                    <span>Scheduled Jobs</span>
-                </div>
-                <div class="jobs-section">
-                    <h3>Today</h3>
-                    <div id="today-jobs">
-                        <div class="loading"></div>
-                    </div>
-                </div>
-                <div class="jobs-section">
-                    <h3>Tomorrow</h3>
-                    <div id="tomorrow-jobs">
-                        <div class="loading"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Revenue vs BEP -->
-            <div class="widget revenue-widget">
-                <div class="widget-title">
-                    <div class="widget-icon">💰</div>
-                    <span>Revenue vs Break-Even</span>
-                </div>
-                <div class="revenue-item">
-                    <div>
-                        <div class="revenue-label">Daily</div>
-                        <div class="revenue-value" id="daily-revenue">$0</div>
-                        <div class="revenue-comparison">
-                            BEP: $2,917 (<span id="daily-diff">$0</span>)
-                        </div>
-                    </div>
-                </div>
-                <div class="revenue-item">
-                    <div>
-                        <div class="revenue-label">Weekly</div>
-                        <div class="revenue-value" id="weekly-revenue">$0</div>
-                        <div class="revenue-comparison">
-                            BEP: $14,585 (<span id="weekly-diff">$0</span>)
-                        </div>
-                    </div>
-                </div>
-                <div class="revenue-item">
-                    <div>
-                        <div class="revenue-label">Monthly</div>
-                        <div class="revenue-value" id="monthly-revenue">$0</div>
-                        <div class="revenue-comparison">
-                            BEP: $62,706 (<span id="monthly-diff">$0</span>)
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- YTD Revenue -->
-            <div class="widget ytd-widget">
-                <div class="widget-title">
-                    <div class="widget-icon">📊</div>
-                    <span>Year-to-Date Revenue</span>
-                </div>
-                <div class="ytd-comparison">
-                    <div class="ytd-item">
-                        <div class="ytd-year">2024 YTD</div>
-                        <div class="ytd-value" id="ytd-previous">$0</div>
-                    </div>
-                    <div class="ytd-divider"></div>
-                    <div class="ytd-item">
-                        <div class="ytd-year">2025 YTD</div>
-                        <div class="ytd-value" id="ytd-current">$0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Phone Stats -->
-            <div class="widget phone-widget">
-                <div class="widget-title" style="width: 100%;">
-                    <div class="widget-icon">📞</div>
-                    <span>OpenPhone Statistics</span>
-                </div>
-                <div class="phone-stat">
-                    <div class="phone-stat-value" id="call-volume">0</div>
-                    <div class="phone-stat-label">Total Calls Today</div>
-                </div>
-                <div class="phone-stat">
-                    <div class="phone-stat-value" id="missed-calls">0</div>
-                    <div class="phone-stat-label">Missed Calls</div>
-                </div>
-            </div>
-
-            <!-- Monday.com Order Status -->
-            <div class="widget">
-                <div class="widget-title">
-                    <div class="widget-icon">📈</div>
-                    <span>Monday.com Order Status</span>
-                </div>
-                <div class="chart-container">
-                    <canvas id="orderStatusChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Vehicle Locations -->
-            <div class="widget vehicle-widget">
-                <div class="widget-title">
-                    <div class="widget-icon">🚛</div>
-                    <span>Fleet Locations</span>
-                </div>
-                <div class="map-placeholder" id="vehicle-map">
-                    Waiting for AirIQ Fleet API access...
-                </div>
-            </div>
-
-            <!-- Notes Section -->
-            <div class="widget notes-widget">
-                <div class="widget-title">
-                    <div class="widget-icon">📝</div>
-                    <span>Notes</span>
-                </div>
-                <textarea class="notes-content" id="notes-area" placeholder="Type your notes here..."></textarea>
-            </div>
+        <div class="datetime">
+            <div class="time" id="current-time">--:--:--</div>
+            <div class="date" id="current-date">Loading...</div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Revenue Tiles - Row 1 -->
+        <div class="tile revenue-tile">
+            <div class="tile-header">Daily Revenue</div>
+            <div class="revenue-amount" id="daily-revenue">$0</div>
+            <div class="revenue-vs-bep">
+                <span class="bep-amount">BEP: $2,917</span>
+                <span class="revenue-difference" id="daily-diff">$0</span>
+            </div>
+        </div>
+
+        <div class="tile revenue-tile">
+            <div class="tile-header">Weekly Revenue</div>
+            <div class="revenue-amount" id="weekly-revenue">$0</div>
+            <div class="revenue-vs-bep">
+                <span class="bep-amount">BEP: $14,585</span>
+                <span class="revenue-difference" id="weekly-diff">$0</span>
+            </div>
+        </div>
+
+        <div class="tile revenue-tile">
+            <div class="tile-header">Monthly Revenue</div>
+            <div class="revenue-amount" id="monthly-revenue">$0</div>
+            <div class="revenue-vs-bep">
+                <span class="bep-amount">BEP: $62,706</span>
+                <span class="revenue-difference" id="monthly-diff">$0</span>
+            </div>
+        </div>
+
+        <!-- Stats Tiles - Row 2 -->
+        <div class="tile stats-tile">
+            <div class="stats-value" id="call-volume">—</div>
+            <div class="stats-label">Calls Today</div>
+        </div>
+
+        <div class="tile stats-tile">
+            <div class="stats-value" id="missed-calls">—</div>
+            <div class="stats-label">Missed Calls</div>
+        </div>
+
+        <div class="tile stats-tile">
+            <div>
+                <div style="font-size: 16px; color: #999;">YTD Previous</div>
+                <div style="font-size: 20px; font-weight: 600;" id="ytd-previous">$0</div>
+            </div>
+            <div style="margin-top: 10px;">
+                <div style="font-size: 16px; color: #ff6b35;">YTD Current</div>
+                <div style="font-size: 20px; font-weight: 600;" id="ytd-current">$0</div>
+            </div>
+        </div>
+
+        <!-- Notes - Spans rows 1, 2, and 3 -->
+        <div class="tile notes-tile">
+            <div class="tile-header" style="color: #ff6b35;">Shit List</div>
+            <textarea id="notes-area" placeholder="Enter notes here..."></textarea>
+        </div>
+
+        <!-- Jobs Tile -->
+        <div class="tile jobs-tile">
+            <div class="tile-header">Scheduled Jobs</div>
+            <div class="jobs-section">
+                <h4>Today</h4>
+                <div class="jobs-list" id="today-jobs">Loading...</div>
+            </div>
+            <div class="jobs-section">
+                <h4>Tomorrow</h4>
+                <div class="jobs-list" id="tomorrow-jobs">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Order Status Chart -->
+        <div class="tile order-status-tile">
+            <div class="tile-header">Order Status</div>
+            <div class="chart-container">
+                <canvas id="orderStatusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Vehicle Map -->
+        <div class="tile map-tile">
+            <div class="tile-header">Vehicle Locations</div>
+            <div id="vehicle-map"></div>
+        </div>
+    </div>
+
     <script src="dashboard.js"></script>
 </body>
 </html>
