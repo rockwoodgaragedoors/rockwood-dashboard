@@ -234,41 +234,30 @@ function calculateAndDisplayRevenue(invoices) {
 // Fetch OpenPhone stats
 async function fetchOpenPhoneStats() {
     try {
-        const today = new Date();
-        const startOfDay = new Date(today.setHours(0,0,0,0)).toISOString();
-        
-        // First, check if we need to get phone numbers (optional - you can skip this if you want to hardcode the Primary ID)
-        const response = await fetch('/.netlify/functions/openphone', {
-            method: 'POST',
+        // Fetch stats from our webhook endpoint
+        const response = await fetch('/.netlify/functions/openphone-webhook', {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                startTime: startOfDay,
-                phoneNumberId: 'PNDcUZEsVX' // Primary line ID
-            })
+            }
         });
 
-        const data = await response.json();
-        console.log('OpenPhone calls response:', JSON.stringify(data, null, 2));
-        
-        // Check if we got call data
-        if (data.data && Array.isArray(data.data)) {
-            const totalCalls = data.data.length;
+        if (response.ok) {
+            const stats = await response.json();
+            console.log('OpenPhone webhook stats:', stats);
             
-            // Count missed calls - need to check the actual structure of call objects
-            const missedCalls = data.data.filter(call => {
-                // The status field might be different - check the console log to see the actual structure
-                return call.status === 'missed' || call.direction === 'inbound' && !call.answeredAt;
-            }).length;
+            document.getElementById('call-volume').textContent = stats.totalCalls || 0;
+            document.getElementById('missed-calls').textContent = stats.missedCalls || 0;
             
-            document.getElementById('call-volume').textContent = totalCalls;
-            document.getElementById('missed-calls').textContent = missedCalls;
+            // If no calls yet, show a helpful message
+            if (stats.totalCalls === 0) {
+                document.getElementById('call-volume').innerHTML = 
+                    '<span style="font-size: 12px;" title="Webhook is set up and waiting for calls">Ready</span>';
+            }
         } else {
-            console.error('Unexpected OpenPhone response format:', data);
-            document.getElementById('call-volume').textContent = '—';
-            document.getElementById('missed-calls').textContent = '—';
+            throw new Error('Failed to fetch webhook stats');
         }
+        
     } catch (error) {
         console.error('Error fetching OpenPhone stats:', error);
         document.getElementById('call-volume').textContent = '—';
