@@ -22,16 +22,16 @@ exports.handler = async (event) => {
   try {
     const { startTime } = JSON.parse(event.body);
     
+    // First, let's try to get phone numbers to understand the API structure
     return new Promise((resolve) => {
+      // Try the messages endpoint which might include call data
+      // Or try the phone-numbers endpoint first to get valid phoneNumberIds
       const options = {
         hostname: 'api.openphone.com',
-        path: `/v1/calls?startTime=${startTime}`,
+        path: '/v1/phone-numbers', // Start with getting phone numbers
         method: 'GET',
         headers: {
-          // Try without Bearer prefix first
-          'Authorization': OPENPHONE_API_KEY,
-          // Alternative: OpenPhone might use a different header
-          'X-API-Key': OPENPHONE_API_KEY,
+          'Authorization': OPENPHONE_API_KEY, // No Bearer prefix, just the key
           'Content-Type': 'application/json'
         }
       };
@@ -44,23 +44,44 @@ exports.handler = async (event) => {
         });
         
         res.on('end', () => {
-          // Pass through the actual status code from OpenPhone
           const statusCode = res.statusCode;
           
-          // Log for debugging (will show in Netlify function logs)
           console.log('OpenPhone Response Status:', statusCode);
           console.log('Response Headers:', res.headers);
           
-          // If we get a non-2xx status, include the error details
           if (statusCode >= 400) {
             console.error('OpenPhone Error Response:', responseData);
           }
           
-          resolve({
-            statusCode: statusCode,
-            headers: { ...headers, 'Content-Type': 'application/json' },
-            body: responseData
-          });
+          // If we successfully get phone numbers, we can then fetch calls
+          if (statusCode === 200) {
+            try {
+              const phoneNumbers = JSON.parse(responseData);
+              console.log('Phone numbers found:', phoneNumbers);
+              
+              // Return the phone numbers for now so we can see the structure
+              resolve({
+                statusCode: 200,
+                headers: { ...headers, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  phoneNumbers: phoneNumbers,
+                  message: "Successfully retrieved phone numbers. Next step: use phoneNumberId to get calls."
+                })
+              });
+            } catch (parseError) {
+              resolve({
+                statusCode: 200,
+                headers: { ...headers, 'Content-Type': 'application/json' },
+                body: responseData
+              });
+            }
+          } else {
+            resolve({
+              statusCode: statusCode,
+              headers: { ...headers, 'Content-Type': 'application/json' },
+              body: responseData
+            });
+          }
         });
       });
       
