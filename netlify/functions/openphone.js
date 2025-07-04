@@ -9,7 +9,7 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
-
+  
   // Handle preflight requests
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -18,7 +18,7 @@ exports.handler = async (event) => {
       body: ''
     };
   }
-
+  
   try {
     const { startTime } = JSON.parse(event.body);
     
@@ -28,7 +28,11 @@ exports.handler = async (event) => {
         path: `/v1/calls?startTime=${startTime}`,
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${OPENPHONE_API_KEY}`
+          // Try without Bearer prefix first
+          'Authorization': OPENPHONE_API_KEY,
+          // Alternative: OpenPhone might use a different header
+          'X-API-Key': OPENPHONE_API_KEY,
+          'Content-Type': 'application/json'
         }
       };
       
@@ -40,8 +44,20 @@ exports.handler = async (event) => {
         });
         
         res.on('end', () => {
+          // Pass through the actual status code from OpenPhone
+          const statusCode = res.statusCode;
+          
+          // Log for debugging (will show in Netlify function logs)
+          console.log('OpenPhone Response Status:', statusCode);
+          console.log('Response Headers:', res.headers);
+          
+          // If we get a non-2xx status, include the error details
+          if (statusCode >= 400) {
+            console.error('OpenPhone Error Response:', responseData);
+          }
+          
           resolve({
-            statusCode: 200,
+            statusCode: statusCode,
             headers: { ...headers, 'Content-Type': 'application/json' },
             body: responseData
           });
@@ -49,6 +65,7 @@ exports.handler = async (event) => {
       });
       
       req.on('error', (error) => {
+        console.error('Request Error:', error);
         resolve({
           statusCode: 500,
           headers,
@@ -59,6 +76,7 @@ exports.handler = async (event) => {
       req.end();
     });
   } catch (error) {
+    console.error('Handler Error:', error);
     return {
       statusCode: 500,
       headers,
