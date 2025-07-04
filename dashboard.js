@@ -1,3 +1,59 @@
+// Add this to the top of your dashboard.js file
+
+// Jobber API wrapper with auto-refresh handling
+async function callJobberAPI(query, variables = {}) {
+    try {
+        const response = await fetch('/.netlify/functions/jobber', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query, variables })
+        });
+        
+        const data = await response.json();
+        
+        // Check if token was refreshed
+        if (data._tokenRefreshed) {
+            console.warn('🔄 Jobber token was refreshed!');
+            console.warn('NEW TOKEN:', data._newToken);
+            console.warn('ACTION REQUIRED: Update JOBBER_API_KEY in Netlify with the new token above');
+            
+            // Show alert to user
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff6b35;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 1000;
+                font-size: 14px;
+                max-width: 400px;
+            `;
+            alertDiv.innerHTML = `
+                <strong>⚠️ Jobber Token Refreshed</strong><br>
+                <small>The token has been automatically refreshed. Check console for new token.</small>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            // Remove alert after 10 seconds
+            setTimeout(() => alertDiv.remove(), 10000);
+            
+            // Clean up the response
+            delete data._tokenRefreshed;
+            delete data._newToken;
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Jobber API call failed:', error);
+        throw error;
+    }
+}
 // Break-even points
 const BEP = {
     daily: 2917,
@@ -43,40 +99,29 @@ async function fetchJobberJobs() {
         tomorrow.setDate(tomorrow.getDate() + 1);
         
         console.log('Calling Jobber API...');
-        const response = await fetch('/.netlify/functions/jobber', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: `
-                    query {
-                        visits(
-                            filter: {
-                                startAt: {
-                                    after: "${today.toISOString().split('T')[0]}T00:00:00Z"
-                                    before: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
-                                }
-                            }
-                            first: 50
-                        ) {
-                            nodes {
-                                startAt
-                                client { name }
-                                property { address { street1 city } }
-                            }
+        
+        const query = `
+            query {
+                visits(
+                    filter: {
+                        startAt: {
+                            after: "${today.toISOString().split('T')[0]}T00:00:00Z"
+                            before: "${tomorrow.toISOString().split('T')[0]}T23:59:59Z"
                         }
                     }
-                `
-            })
-        });
+                    first: 50
+                ) {
+                    nodes {
+                        startAt
+                        client { name }
+                        property { address { street1 city } }
+                    }
+                }
+            }
+        `;
         
-        console.log('Jobber response status:', response.status);
-        if (!response.ok) {
-            console.error('Jobber response not OK:', await response.text());
-        }
+        const data = await callJobberAPI(query);
         
-        const data = await response.json();
         console.log('Jobber response:', JSON.stringify(data, null, 2)); 
         
         if (data.errors) {
@@ -133,39 +178,28 @@ async function fetchJobberRevenue() {
         const endOfLastYear = new Date(now.getFullYear() - 1, 11, 31);
 
         console.log('Calling Jobber API...');
-        const response = await fetch('/.netlify/functions/jobber', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-           body: JSON.stringify({
-    query: `
-        query {
-            invoices(
-                filter: {
-                    createdAt: {
-                        after: "${startOfLastYear.toISOString()}"
+        
+        const query = `
+            query {
+                invoices(
+                    filter: {
+                        createdAt: {
+                            after: "${startOfLastYear.toISOString()}"
+                        }
+                        status: paid
                     }
-                    status: paid
-                }
-                first: 1000
-            ) {
-                nodes {
-                    total
-                    createdAt
+                    first: 1000
+                ) {
+                    nodes {
+                        total
+                        createdAt
+                    }
                 }
             }
-        }
-    `
-})
-        });
+        `;
         
-        console.log('Jobber response status:', response.status);
-        if (!response.ok) {
-            console.error('Jobber response not OK:', await response.text());
-        }
+        const data = await callJobberAPI(query);
         
-        const data = await response.json();
         console.log('Jobber revenue response:', JSON.stringify(data, null, 2));
         
         if (data.errors) {
