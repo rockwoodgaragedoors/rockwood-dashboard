@@ -1,5 +1,3 @@
-// Add this to the top of your dashboard.js file
-
 // Jobber API wrapper with auto-refresh handling
 async function callJobberAPI(query, variables = {}) {
     try {
@@ -54,6 +52,7 @@ async function callJobberAPI(query, variables = {}) {
         throw error;
     }
 }
+
 // Break-even points
 const BEP = {
     daily: 2917,
@@ -211,6 +210,7 @@ async function fetchJobberRevenue() {
         console.error('Error fetching revenue:', error);
     }
 }
+
 // Calculate and display revenue
 function calculateAndDisplayRevenue(invoices) {
     const now = new Date();
@@ -331,7 +331,7 @@ async function fetchMondayOrderStatus() {
         });
 
         const data = await response.json();
-console.log('Monday boards:', JSON.stringify(data.data.boards.map(b => ({name: b.name, id: b.id, columns: b.columns})), null, 2));
+        console.log('Monday boards:', JSON.stringify(data.data.boards.map(b => ({name: b.name, id: b.id, columns: b.columns})), null, 2));
         displayOrderStatusChart(data.data.boards[0].items_page.items);
     } catch (error) {
         console.error('Error fetching Monday.com data:', error);
@@ -349,7 +349,7 @@ function displayOrderStatusChart(items) {
     })));
     
     // Statuses to exclude from the chart
-const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo', 'Default', 'DONE', 'DONE (OTHER)', 'DAMAGED', 'MISSING PHOTO'];
+    const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo', 'Default', 'DONE', 'DONE (OTHER)', 'DAMAGED', 'MISSING PHOTO'];
     
     items.forEach(item => {
         // Find the status column value
@@ -409,7 +409,7 @@ const excludedStatuses = ['Done', 'Done (Other)', 'Missing Photo', 'Default', 'D
         }
     });
 }
-// Fetch AirIQ Fleet vehicle locations
+
 // Fetch AirIQ Fleet vehicle locations
 async function fetchAirIQVehicles() {
     try {
@@ -437,7 +437,7 @@ async function fetchAirIQVehicles() {
             });
 
             const fleetsData = await fleetsResponse.json();
-            console.log('Fleets response status:', fleetsResponse.status);  // NEW LINE
+            console.log('Fleets response status:', fleetsResponse.status);
             console.log('AirIQ Fleets:', fleetsData);
 
             if (fleetsData && fleetsData.length > 0) {
@@ -454,7 +454,7 @@ async function fetchAirIQVehicles() {
                 const assetsData = await assetsResponse.json();
                 displayVehicleLocations(assetsData);
             } else {
-                // NEW SECTION - If no fleets found, try getting all assets directly
+                // If no fleets found, try getting all assets directly
                 console.log('No fleets found, trying direct asset approach...');
                 
                 // Try AEMP endpoint which returns all assets
@@ -494,15 +494,15 @@ function displayVehicleLocations(vehicles) {
     // Clear any existing map
     mapDiv.innerHTML = '';
     
-  // Create container for map and legend
-mapDiv.innerHTML = `
-    <div style="position: relative; height: 100%; width: 100%;">
-        <div id="actual-map" style="position: absolute; top: 0; left: 0; right: 220px; bottom: 0; border-radius: 10px;"></div>
-        <div id="map-legend" style="position: absolute; top: 0; right: 0; width: 200px; bottom: 0; background: rgba(40, 40, 40, 0.8); border-radius: 10px; padding: 15px; overflow-y: auto;">
-            <div style="color: #ff661a; font-weight: bold; margin-bottom: 10px;">Vehicle Legend</div>
+    // Create container for map and legend
+    mapDiv.innerHTML = `
+        <div style="position: relative; height: 100%; width: 100%;">
+            <div id="actual-map" style="position: absolute; top: 0; left: 0; right: 220px; bottom: 0; border-radius: 10px;"></div>
+            <div id="map-legend" style="position: absolute; top: 0; right: 0; width: 200px; bottom: 0; background: rgba(40, 40, 40, 0.8); border-radius: 10px; padding: 15px; overflow-y: auto;">
+                <div style="color: #ff661a; font-weight: bold; margin-bottom: 10px;">Vehicle Legend</div>
+            </div>
         </div>
-    </div>
-`;
+    `;
     
     // Wait for DOM to update
     setTimeout(() => {
@@ -515,84 +515,29 @@ mapDiv.innerHTML = `
             maxZoom: 19
         }).addTo(vehicleMap);
         
-        // Find this section in your displayVehicleLocations function and replace it:
+        // Define colors and names for vehicles
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
+                       'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
 
-// Define colors and names for vehicles
-const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
-               'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
+        // Custom vehicle names mapping
+        const vehicleNames = {
+            0: "Matt",
+            1: "JJ's Van", 
+            2: "Jay's Truck",
+            3: "New Van"
+        };
 
-// Custom vehicle names mapping
-const vehicleNames = {
-    0: "Matt",
-    1: "JJ's Van", 
-    2: "Jay's Truck",
-    3: "New Van"
-};
-
-// Track bounds for all vehicles
-const bounds = [];
-let vehiclesWithLocation = 0;
-const legendDiv = document.getElementById('map-legend');
-
-// Add markers for each vehicle
-vehicles.forEach((vehicle, index) => {
-    const status = vehicle.status || vehicle;
-    const lat = status.latitude || status.lat;
-    const lng = status.longitude || status.lng || status.lon;
-    const name = vehicleNames[index] || vehicle.name || status.name || `Vehicle ${index + 1}`;
-    const color = colors[index % colors.length];
-    
-    if (lat && lng) {
-        vehiclesWithLocation++;
-        
-        // Create colored marker icon
-        const markerIcon = new L.Icon({
-            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
-            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
-        
-        const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(vehicleMap);
-        
-        // Create popup content
-        let popupContent = `<strong>${name}</strong><br/>`;
-        if (status.speed !== undefined) {
-            popupContent += `Speed: ${status.speed} km/h<br/>`;
-        }
-        if (status.heading !== undefined) {
-            popupContent += `Heading: ${status.heading}°<br/>`;
-        }
-        if (status.odometer !== undefined) {
-            popupContent += `Odometer: ${status.odometer} km<br/>`;
-        }
-        
-        marker.bindPopup(popupContent);
-        bounds.push([lat, lng]);
-        
-        // Add to legend
-        legendDiv.innerHTML += `
-            <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <div style="width: 20px; height: 20px; background-color: ${color}; border-radius: 50%; margin-right: 10px;"></div>
-                <div style="color: #ccc; font-size: 14px;">${name}</div>
-            </div>
-        `;
-    }
-});
-        
         // Track bounds for all vehicles
         const bounds = [];
         let vehiclesWithLocation = 0;
         const legendDiv = document.getElementById('map-legend');
-        
+
         // Add markers for each vehicle
         vehicles.forEach((vehicle, index) => {
             const status = vehicle.status || vehicle;
             const lat = status.latitude || status.lat;
             const lng = status.longitude || status.lng || status.lon;
-            const name = vehicle.name || status.name || `Vehicle ${index + 1}`;
+            const name = vehicleNames[index] || vehicle.name || status.name || `Vehicle ${index + 1}`;
             const color = colors[index % colors.length];
             
             if (lat && lng) {
@@ -641,6 +586,7 @@ vehicles.forEach((vehicle, index) => {
         }
     }, 100);
 }
+
 // Save and load notes
 function setupNotes() {
     const notesArea = document.getElementById('notes-area');
@@ -656,6 +602,7 @@ function setupNotes() {
         localStorage.setItem('dashboard-notes', notesArea.value);
     });
 }
+
 // Refresh all data
 function refreshAllData() {
     fetchJobberJobs();
@@ -663,7 +610,6 @@ function refreshAllData() {
     fetchOpenPhoneStats();
     fetchMondayOrderStatus();
     fetchAirIQVehicles();
-
 }
 
 // Initialize dashboard
