@@ -237,21 +237,38 @@ async function fetchOpenPhoneStats() {
         const today = new Date();
         const startOfDay = new Date(today.setHours(0,0,0,0)).toISOString();
         
+        // First, check if we need to get phone numbers (optional - you can skip this if you want to hardcode the Primary ID)
         const response = await fetch('/.netlify/functions/openphone', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ startTime: startOfDay })
+            body: JSON.stringify({ 
+                startTime: startOfDay,
+                phoneNumberId: 'PNDcUZEsVX' // Primary line ID
+            })
         });
 
         const data = await response.json();
-        console.log('OpenPhone response:', JSON.stringify(data, null, 2));
-        const totalCalls = data.data.length;
-        const missedCalls = data.data.filter(call => call.status === 'missed').length;
+        console.log('OpenPhone calls response:', JSON.stringify(data, null, 2));
         
-        document.getElementById('call-volume').textContent = totalCalls;
-        document.getElementById('missed-calls').textContent = missedCalls;
+        // Check if we got call data
+        if (data.data && Array.isArray(data.data)) {
+            const totalCalls = data.data.length;
+            
+            // Count missed calls - need to check the actual structure of call objects
+            const missedCalls = data.data.filter(call => {
+                // The status field might be different - check the console log to see the actual structure
+                return call.status === 'missed' || call.direction === 'inbound' && !call.answeredAt;
+            }).length;
+            
+            document.getElementById('call-volume').textContent = totalCalls;
+            document.getElementById('missed-calls').textContent = missedCalls;
+        } else {
+            console.error('Unexpected OpenPhone response format:', data);
+            document.getElementById('call-volume').textContent = '—';
+            document.getElementById('missed-calls').textContent = '—';
+        }
     } catch (error) {
         console.error('Error fetching OpenPhone stats:', error);
         document.getElementById('call-volume').textContent = '—';
