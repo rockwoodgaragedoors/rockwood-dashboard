@@ -515,9 +515,72 @@ mapDiv.innerHTML = `
             maxZoom: 19
         }).addTo(vehicleMap);
         
-        // Define colors for vehicles
-        const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
-                       'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
+        // Find this section in your displayVehicleLocations function and replace it:
+
+// Define colors and names for vehicles
+const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'darkred', 'lightred', 
+               'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'pink', 'lightblue', 'lightgreen'];
+
+// Custom vehicle names mapping
+const vehicleNames = {
+    0: "Matt",
+    1: "JJ's Van", 
+    2: "Jay's Truck",
+    3: "New Van"
+};
+
+// Track bounds for all vehicles
+const bounds = [];
+let vehiclesWithLocation = 0;
+const legendDiv = document.getElementById('map-legend');
+
+// Add markers for each vehicle
+vehicles.forEach((vehicle, index) => {
+    const status = vehicle.status || vehicle;
+    const lat = status.latitude || status.lat;
+    const lng = status.longitude || status.lng || status.lon;
+    const name = vehicleNames[index] || vehicle.name || status.name || `Vehicle ${index + 1}`;
+    const color = colors[index % colors.length];
+    
+    if (lat && lng) {
+        vehiclesWithLocation++;
+        
+        // Create colored marker icon
+        const markerIcon = new L.Icon({
+            iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${color}.png`,
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+        
+        const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(vehicleMap);
+        
+        // Create popup content
+        let popupContent = `<strong>${name}</strong><br/>`;
+        if (status.speed !== undefined) {
+            popupContent += `Speed: ${status.speed} km/h<br/>`;
+        }
+        if (status.heading !== undefined) {
+            popupContent += `Heading: ${status.heading}°<br/>`;
+        }
+        if (status.odometer !== undefined) {
+            popupContent += `Odometer: ${status.odometer} km<br/>`;
+        }
+        
+        marker.bindPopup(popupContent);
+        bounds.push([lat, lng]);
+        
+        // Add to legend
+        legendDiv.innerHTML += `
+            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                <div style="width: 20px; height: 20px; background-color: ${color}; border-radius: 50%; margin-right: 10px;"></div>
+                <div style="color: #ccc; font-size: 14px;">${name}</div>
+            </div>
+        `;
+    }
+});
         
         // Track bounds for all vehicles
         const bounds = [];
