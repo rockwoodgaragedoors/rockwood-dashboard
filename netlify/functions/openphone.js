@@ -20,21 +20,77 @@ exports.handler = async (event) => {
   }
   
   try {
-    const { startTime } = JSON.parse(event.body);
+    const { startTime, phoneNumberId } = JSON.parse(event.body);
     
-    // First, let's try to get phone numbers to understand the API structure
+    // If no phoneNumberId provided, we need to get the phone numbers first
+    if (!phoneNumberId) {
+      return new Promise((resolve) => {
+        const options = {
+          hostname: 'api.openphone.com',
+          path: '/v1/phone-numbers',
+          method: 'GET',
+          headers: {
+            'Authorization': OPENPHONE_API_KEY,
+            'Content-Type': 'application/json'
+          }
+        };
+        
+        const req = https.request(options, (res) => {
+          let responseData = '';
+          
+          res.on('data', (chunk) => {
+            responseData += chunk;
+          });
+          
+          res.on('end', () => {
+            resolve({
+              statusCode: res.statusCode,
+              headers: { ...headers, 'Content-Type': 'application/json' },
+              body: responseData
+            });
+          });
+        });
+        
+        req.on('error', (error) => {
+          resolve({
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ error: error.message })
+          });
+        });
+        
+        req.end();
+      });
+    }
+    
+    // If we have phoneNumberId, get the calls
     return new Promise((resolve) => {
-      // Try the messages endpoint which might include call data
-      // Or try the phone-numbers endpoint first to get valid phoneNumberIds
+      // Build query parameters
+      const params = new URLSearchParams();
+      
+      // Add date filters using the new format
+      const now = new Date();
+      const start = new Date(startTime);
+      params.append('createdAfter', start.toISOString());
+      params.append('createdBefore', now.toISOString());
+      
+      // Add phoneNumberId
+      params.append('phoneNumberId', phoneNumberId);
+      
+      // You might also want to add pagination
+      params.append('limit', '100'); // Adjust as needed
+      
       const options = {
         hostname: 'api.openphone.com',
-        path: '/v1/phone-numbers', // Start with getting phone numbers
+        path: `/v1/calls?${params.toString()}`,
         method: 'GET',
         headers: {
-          'Authorization': OPENPHONE_API_KEY, // No Bearer prefix, just the key
+          'Authorization': OPENPHONE_API_KEY,
           'Content-Type': 'application/json'
         }
       };
+      
+      console.log('OpenPhone API URL:', `https://api.openphone.com/v1/calls?${params.toString()}`);
       
       const req = https.request(options, (res) => {
         let responseData = '';
@@ -47,41 +103,16 @@ exports.handler = async (event) => {
           const statusCode = res.statusCode;
           
           console.log('OpenPhone Response Status:', statusCode);
-          console.log('Response Headers:', res.headers);
           
           if (statusCode >= 400) {
             console.error('OpenPhone Error Response:', responseData);
           }
           
-          // If we successfully get phone numbers, we can then fetch calls
-          if (statusCode === 200) {
-            try {
-              const phoneNumbers = JSON.parse(responseData);
-              console.log('Phone numbers found:', phoneNumbers);
-              
-              // Return the phone numbers for now so we can see the structure
-              resolve({
-                statusCode: 200,
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  phoneNumbers: phoneNumbers,
-                  message: "Successfully retrieved phone numbers. Next step: use phoneNumberId to get calls."
-                })
-              });
-            } catch (parseError) {
-              resolve({
-                statusCode: 200,
-                headers: { ...headers, 'Content-Type': 'application/json' },
-                body: responseData
-              });
-            }
-          } else {
-            resolve({
-              statusCode: statusCode,
-              headers: { ...headers, 'Content-Type': 'application/json' },
-              body: responseData
-            });
-          }
+          resolve({
+            statusCode: statusCode,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: responseData
+          });
         });
       });
       
