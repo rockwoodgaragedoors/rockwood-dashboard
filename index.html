@@ -13,21 +13,48 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #0a0a0a;
+            background: #000;
             color: #ffffff;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
-        /* Header - Compact */
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(78, 205, 196, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(170, 120, 214, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(1deg); }
+            66% { transform: translateY(10px) rotate(-1deg); }
+        }
+
+        /* Header - Modern glass effect */
         .header {
-            background-color: #1a1a1a;
+            background: rgba(26, 26, 26, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
             height: 60px;
+            position: relative;
+            z-index: 10;
         }
 
         .header-left {
@@ -39,12 +66,22 @@
         .logo {
             height: 40px;
             width: auto;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.3));
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
         }
 
         .company-name {
             font-size: 24px;
             font-weight: 600;
-            color: #ff6b35;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
         }
 
         .datetime {
@@ -54,49 +91,99 @@
         .time {
             font-size: 24px;
             font-weight: 300;
-            color: #ff6b35;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
         }
 
         .date {
             font-size: 14px;
             color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         /* Main Container */
         .main-container {
             height: calc(100vh - 60px);
-            padding: 15px;
+            padding: 20px;
             overflow: hidden;
         }
 
-        /* Dashboard Grid - Fixed for ultrawide */
+        /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: 120px 120px 1fr;
-            gap: 15px;
+            grid-template-rows: 140px 140px 1fr;
+            gap: 20px;
             height: 100%;
             max-width: 100%;
         }
 
+        /* Modern Glassmorphism Tiles */
         .tile {
-            background-color: #1a1a1a;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 0, 0, 0.37),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
-            border: 1px solid #2a2a2a;
             overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 40px 0 rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Gradient accents for specific tiles */
+        .tile.accent-orange {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+        }
+
+        .tile.accent-teal {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(78, 205, 196, 0.05) 100%);
+        }
+
+        .tile.accent-purple {
+            background: linear-gradient(135deg, rgba(170, 120, 214, 0.1) 0%, rgba(170, 120, 214, 0.05) 100%);
         }
 
         .tile-header {
-            font-size: 14px;
+            font-size: 12px;
             color: #999;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            flex-shrink: 0;
+            letter-spacing: 2px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Icon animations */
+        .tile-header::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: #ff6b35;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
         }
 
         /* Grid positioning */
@@ -115,64 +202,101 @@
         .notes-tile { 
             grid-column: 4; 
             grid-row: 1 / 4; 
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 107, 53, 0.02) 100%);
         }
 
-        /* Revenue styling */
+        /* Revenue styling - Modern numbers */
         .revenue-amount {
-            font-size: 28px;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 5px;
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a39a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            line-height: 1;
         }
 
-        .revenue-vs-bep {
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .bep-amount {
-            color: #666;
-        }
-
-        .revenue-difference {
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
+        .revenue-subtext {
             font-size: 12px;
+            color: #666;
+            transition: color 0.3s ease;
         }
 
-        .revenue-difference.positive {
-            background-color: rgba(52, 211, 153, 0.2);
-            color: #34d399;
+        .tile:hover .revenue-subtext {
+            color: #999;
         }
 
-        .revenue-difference.negative {
-            background-color: rgba(248, 113, 113, 0.2);
-            color: #f87171;
-        }
-
-        /* Stats styling */
-        .stats-content {
+        .revenue-row {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .revenue-row:last-child {
+            border-bottom: none;
+        }
+
+        .revenue-row:hover {
+            background: rgba(255, 255, 255, 0.03);
+            padding-left: 8px;
+            margin: 0 -8px;
+        }
+
+        .revenue-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .revenue-value {
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Stats styling - Modern cards */
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
             flex: 1;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.05);
         }
 
         .stats-value {
-            font-size: 36px;
-            font-weight: 600;
-            color: #ff6b35;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stats-label {
-            font-size: 12px;
-            color: #999;
+            font-size: 10px;
+            color: #666;
             text-transform: uppercase;
-            margin-top: 5px;
+            margin-top: 4px;
+            letter-spacing: 1px;
         }
 
         /* YTD Stats special styling */
@@ -181,26 +305,36 @@
             flex-direction: column;
             justify-content: center;
             flex: 1;
-            gap: 10px;
+            gap: 12px;
         }
 
         .ytd-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .ytd-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(4px);
         }
 
         .ytd-label {
-            font-size: 14px;
+            font-size: 13px;
             color: #999;
+            font-weight: 500;
         }
 
         .ytd-value {
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
-        /* Jobs styling */
+        /* Jobs styling - Modern list */
         .jobs-content {
             display: flex;
             flex-direction: column;
@@ -212,45 +346,65 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             overflow: hidden;
         }
 
         .jobs-section h4 {
-            font-size: 12px;
+            font-size: 11px;
             color: #ff6b35;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            flex-shrink: 0;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .jobs-section h4::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.3) 0%, transparent 100%);
         }
 
         .jobs-list {
             overflow-y: auto;
             flex: 1;
+            padding-right: 5px;
         }
 
         .job-item {
-            background-color: #252525;
-            padding: 8px;
-            margin-bottom: 6px;
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
             font-size: 12px;
-            border-left: 3px solid #ff6b35;
+            border-left: 3px solid transparent;
+            border-image: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%) 1;
+            transition: all 0.3s ease;
+        }
+
+        .job-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(4px);
         }
 
         .job-time {
             color: #ff6b35;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 11px;
+            text-transform: uppercase;
         }
 
         .job-customer {
             color: #fff;
-            margin: 2px 0;
+            margin: 4px 0;
+            font-weight: 500;
         }
 
         .job-address {
-            color: #888;
+            color: #666;
             font-size: 11px;
         }
 
@@ -259,57 +413,78 @@
             flex: 1;
             position: relative;
             min-height: 0;
+            padding: 10px;
         }
 
-        /* Map container */
+        /* Map container - Modern style */
         #vehicle-map {
             flex: 1;
-            border-radius: 8px;
+            border-radius: 16px;
             overflow: hidden;
             min-height: 0;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* Notes/Shit List */
+        /* Notes/Shit List - Modern textarea */
         #notes-area {
             flex: 1;
-            background-color: #252525;
-            border: 1px solid #333;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 107, 53, 0.2);
             color: #666;
-            padding: 10px;
+            padding: 15px;
             font-size: 18px;
-            line-height: 1.5;
+            line-height: 1.6;
             resize: none;
-            border-radius: 6px;
-            transition: color 0.3s ease;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Monaco', 'Consolas', monospace;
         }
 
         #notes-area:not(:placeholder-shown) {
             color: #ff6b35;
             font-weight: 500;
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
         }
 
         #notes-area:focus {
             outline: none;
-            border-color: #ff6b35;
+            border-color: rgba(255, 107, 53, 0.5);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.2);
         }
 
-        /* Scrollbar styling */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #1a1a1a;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 3px;
+            background: rgba(255, 107, 53, 0.3);
+            border-radius: 4px;
+            transition: background 0.3s ease;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #444;
+            background: rgba(255, 107, 53, 0.5);
+        }
+
+        /* Loading animation */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .loading {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
         }
 
         /* Mobile responsive */
@@ -362,21 +537,22 @@
             .dashboard-grid {
                 display: flex;
                 flex-direction: column;
-                gap: 10px;
+                gap: 15px;
                 height: auto;
             }
 
             .tile {
                 width: 100%;
-                min-height: 100px;
+                min-height: 120px;
+                padding: 15px;
             }
 
             .revenue-amount {
-                font-size: 24px;
+                font-size: 28px;
             }
 
             .stats-value {
-                font-size: 28px;
+                font-size: 24px;
             }
 
             .jobs-tile {
@@ -418,47 +594,54 @@
     <div class="main-container">
         <div class="dashboard-grid">
             <!-- Revenue Tiles - Row 1 -->
-            <div class="tile daily-revenue">
-                <div class="tile-header">Daily Revenue</div>
-                <div class="revenue-amount" id="daily-revenue">$0</div>
-                <div class="revenue-vs-bep">
-                    <span class="bep-amount">BEP: $2,917</span>
-                    <span class="revenue-difference" id="daily-diff">$0</span>
-                </div>
+            <div class="tile daily-revenue accent-teal">
+                <div class="tile-header">Today's Completed Jobs</div>
+                <div class="revenue-amount" id="completed-jobs-value">$0</div>
+                <div class="revenue-subtext" id="completed-jobs-count">0 jobs completed today</div>
             </div>
 
             <div class="tile weekly-revenue">
-                <div class="tile-header">Weekly Revenue</div>
-                <div class="revenue-amount" id="weekly-revenue">$0</div>
-                <div class="revenue-vs-bep">
-                    <span class="bep-amount">BEP: $14,585</span>
-                    <span class="revenue-difference" id="weekly-diff">$0</span>
+                <div class="tile-header">Revenue Summary</div>
+                <div class="revenue-row">
+                    <span class="revenue-label">Today</span>
+                    <span class="revenue-value" id="daily-revenue">$0</span>
+                </div>
+                <div class="revenue-row">
+                    <span class="revenue-label">This Week</span>
+                    <span class="revenue-value" id="weekly-revenue">$0</span>
+                </div>
+                <div class="revenue-row">
+                    <span class="revenue-label">This Month</span>
+                    <span class="revenue-value" id="monthly-revenue">$0</span>
                 </div>
             </div>
 
-            <div class="tile monthly-revenue">
-                <div class="tile-header">Monthly Revenue</div>
-                <div class="revenue-amount" id="monthly-revenue">$0</div>
-                <div class="revenue-vs-bep">
-                    <span class="bep-amount">BEP: $62,706</span>
-                    <span class="revenue-difference" id="monthly-diff">$0</span>
+            <div class="tile monthly-revenue accent-purple">
+                <div class="tile-header">Service vs Installation</div>
+                <div class="chart-container">
+                    <canvas id="serviceVsInstallChart"></canvas>
                 </div>
             </div>
 
             <!-- Stats Tiles - Row 2 -->
-            <div class="tile calls-today">
-                <div class="tile-header">Call Stats</div>
-                <div class="stats-content">
-                    <div class="stats-value" id="call-volume">—</div>
-                    <div class="stats-label">Calls Today</div>
+            <div class="tile calls-today accent-orange">
+                <div class="tile-header">Revenue Trend (30 Days)</div>
+                <div class="chart-container">
+                    <canvas id="revenueTrendChart"></canvas>
                 </div>
             </div>
 
             <div class="tile missed-calls">
-                <div class="tile-header">Missed</div>
-                <div class="stats-content">
-                    <div class="stats-value" id="missed-calls">—</div>
-                    <div class="stats-label">Missed Calls</div>
+                <div class="tile-header">Call Stats</div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stats-value" id="call-volume">—</div>
+                        <div class="stats-label">Total Calls</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stats-value" id="missed-calls" style="color: #f87171;">—</div>
+                        <div class="stats-label">Missed</div>
+                    </div>
                 </div>
             </div>
 
@@ -466,11 +649,11 @@
                 <div class="tile-header">Year to Date</div>
                 <div class="ytd-content">
                     <div class="ytd-item">
-                        <span class="ytd-label">YTD Previous</span>
+                        <span class="ytd-label">Previous Year</span>
                         <span class="ytd-value" id="ytd-previous">$0</span>
                     </div>
-                    <div class="ytd-item">
-                        <span class="ytd-label" style="color: #ff6b35;">YTD Current</span>
+                    <div class="ytd-item" style="background: rgba(255, 107, 53, 0.1);">
+                        <span class="ytd-label" style="color: #ff6b35;">Current Year</span>
                         <span class="ytd-value" style="color: #ff6b35;" id="ytd-current">$0</span>
                     </div>
                 </div>
@@ -482,16 +665,20 @@
                 <div class="jobs-content">
                     <div class="jobs-section">
                         <h4>Today</h4>
-                        <div class="jobs-list" id="today-jobs">Loading...</div>
+                        <div class="jobs-list" id="today-jobs">
+                            <div class="job-item loading" style="height: 60px;"></div>
+                        </div>
                     </div>
                     <div class="jobs-section">
                         <h4>Tomorrow</h4>
-                        <div class="jobs-list" id="tomorrow-jobs">Loading...</div>
+                        <div class="jobs-list" id="tomorrow-jobs">
+                            <div class="job-item loading" style="height: 60px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="tile order-status-tile">
+            <div class="tile order-status-tile accent-purple">
                 <div class="tile-header">Order Status</div>
                 <div class="chart-container">
                     <canvas id="orderStatusChart"></canvas>
@@ -505,7 +692,7 @@
 
             <!-- Shit List - Spans all rows -->
             <div class="tile notes-tile">
-                <div class="tile-header" style="color: #ff6b35;">Shit List</div>
+                <div class="tile-header" style="color: #ff6b35; letter-spacing: 3px;">Shit List</div>
                 <textarea id="notes-area" placeholder="Enter notes here..."></textarea>
             </div>
         </div>
