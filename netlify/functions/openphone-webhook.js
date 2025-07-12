@@ -1,13 +1,13 @@
 const https = require('https');
 
-// In-memory storage for call stats (resets when function cold starts)
-// In production, you'd want to use a database like Supabase, Firebase, or FaunaDB
+// In-memory storage for call stats
 let callStats = {
   today: {
     total: 0,
     missed: 0,
-    byHour: {},
-    lastReset: new Date().toDateString()
+    lastReset: new Date().toDateString(),
+    lastUpdated: null,
+    recentCalls: [] // Store last 10 calls for debugging
   }
 };
 
@@ -18,9 +18,11 @@ function resetDailyStats() {
     callStats.today = {
       total: 0,
       missed: 0,
-      byHour: {},
-      lastReset: today
+      lastReset: today,
+      lastUpdated: null,
+      recentCalls: []
     };
+    console.log('Daily stats reset for new day:', today);
   }
 }
 
@@ -50,8 +52,9 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         totalCalls: callStats.today.total,
         missedCalls: callStats.today.missed,
-        callsByHour: callStats.today.byHour,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: callStats.today.lastUpdated,
+        lastReset: callStats.today.lastReset,
+        recentCalls: callStats.today.recentCalls
       })
     };
   }
@@ -60,40 +63,51 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'POST') {
     try {
       const payload = JSON.parse(event.body);
-      console.log('Webhook received:', payload.type);
+      
+      // Log the webhook for debugging
+      console.log('Webhook received:', payload.type || payload.event);
+      console.log('Call data:', JSON.stringify(payload.data || payload, null, 2));
 
       // Reset daily stats if needed
       resetDailyStats();
 
-      // Handle different webhook events
-      switch (payload.type) {
-        case 'call.completed':
-          const call = payload.data;
-          
-          // Only count calls for the Primary line
-          if (call.phoneNumberId === 'PNDcUZEsVX') {
-            callStats.today.total++;
-            
-            // Track missed calls
-            if (!call.answeredAt || call.status === 'missed') {
-              callStats.today.missed++;
-            }
-            
-            // Track calls by hour
-            const hour = new Date(call.createdAt).getHours();
-            callStats.today.byHour[hour] = (callStats.today.byHour[hour] || 0) + 1;
-            
-            console.log(`Call tracked - Total: ${callStats.today.total}, Missed: ${callStats.today.missed}`);
-          }
-          break;
-
-        case 'call.ringing':
-          // You could track incoming calls in progress here
-          console.log('Call ringing:', payload.data);
-          break;
-
-        default:
-          console.log('Unhandled webhook type:', payload.type);
+      // Handle call.completed events
+      if (payload.type === 'call.completed' || payload.event === 'call.completed') {
+        const callData = payload.data || payload;
+        
+        // Increment total calls
+        callStats.today.total++;
+        
+        // Check if missed (multiple conditions to catch different formats)
+        const isMissed = 
+          callData.status === 'missed' ||
+          callData.disposition === 'missed' ||
+          callData.answeredAt === null ||
+          callData.answered === false ||
+          callData.voicemail === true;
+        
+        if (isMissed) {
+          callStats.today.missed++;
+        }
+        
+        // Update last updated time
+        callStats.today.lastUpdated = new Date().toISOString();
+        
+        // Store recent call info (keep last 10)
+        callStats.today.recentCalls.unshift({
+          time: new Date().toISOString(),
+          from: callData.from,
+          to: callData.to,
+          phoneNumberId: callData.phoneNumberId,
+          missed: isMissed,
+          duration: callData.duration
+        });
+        
+        if (callStats.today.recentCalls.length > 10) {
+          callStats.today.recentCalls.pop();
+        }
+        
+        console.log(`Call processed - Total: ${callStats.today.total}, Missed: ${callStats.today.missed}`);
       }
 
       return {
@@ -104,10 +118,12 @@ exports.handler = async (event) => {
 
     } catch (error) {
       console.error('Webhook processing error:', error);
+      
+      // Still return 200 to acknowledge receipt
       return {
-        statusCode: 400,
+        statusCode: 200,
         headers,
-        body: JSON.stringify({ error: 'Invalid webhook payload' })
+        body: JSON.stringify({ error: 'Processing error but acknowledged' })
       };
     }
   }
