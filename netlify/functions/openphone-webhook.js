@@ -7,7 +7,8 @@ let callStats = {
     missed: 0,
     lastReset: new Date().toDateString(),
     lastUpdated: null,
-    recentCalls: [] // Store last 10 calls for debugging
+    recentCalls: [],
+    activeCalls: {} // Track calls from ringing to completed
   }
 };
 
@@ -20,7 +21,8 @@ function resetDailyStats() {
       missed: 0,
       lastReset: today,
       lastUpdated: null,
-      recentCalls: []
+      recentCalls: [],
+      activeCalls: {}
     };
     console.log('Daily stats reset for new day:', today);
   }
@@ -54,7 +56,8 @@ exports.handler = async (event) => {
         missedCalls: callStats.today.missed,
         lastUpdated: callStats.today.lastUpdated,
         lastReset: callStats.today.lastReset,
-        recentCalls: callStats.today.recentCalls
+        recentCalls: callStats.today.recentCalls,
+        activeCalls: Object.keys(callStats.today.activeCalls).length
       })
     };
   }
@@ -71,43 +74,89 @@ exports.handler = async (event) => {
       // Reset daily stats if needed
       resetDailyStats();
 
+      const callData = payload.data || payload;
+      const callId = callData.id || callData.callId || callData.sid;
+
+      // Handle call.ringing events
+      if (payload.type === 'call.ringing' || payload.event === 'call.ringing') {
+        // Only count incoming calls
+        if (callData.direction === 'incoming' || callData.direction === 'inbound') {
+          // Increment total calls when it starts ringing
+          callStats.today.total++;
+          
+          // Track this call
+          callStats.today.activeCalls[callId] = {
+            startTime: new Date().toISOString(),
+            from: callData.from,
+            to: callData.to,
+            phoneNumberId: callData.phoneNumberId,
+            status: 'ringing'
+          };
+          
+          // Update last updated time
+          callStats.today.lastUpdated = new Date().toISOString();
+          
+          console.log(`Incoming call ringing - Total: ${callStats.today.total}, Call ID: ${callId}`);
+        }
+      }
+
       // Handle call.completed events
       if (payload.type === 'call.completed' || payload.event === 'call.completed') {
-        const callData = payload.data || payload;
-        
-        // Increment total calls
-        callStats.today.total++;
-        
-        // Check if missed (multiple conditions to catch different formats)
-        const isMissed = 
-          callData.status === 'missed' ||
-          callData.disposition === 'missed' ||
-          callData.answeredAt === null ||
-          callData.answered === false ||
-          callData.voicemail === true;
-        
-        if (isMissed) {
-          callStats.today.missed++;
+        // Check if this was a tracked incoming call
+        if (callStats.today.activeCalls[callId]) {
+          // Check if missed
+          const isMissed = 
+            callData.status === 'missed' ||
+            callData.disposition === 'missed' ||
+            callData.answeredAt === null ||
+            callData.answered === false ||
+            (callData.duration && callData.duration === 0);
+          
+          if (isMissed) {
+            callStats.today.missed++;
+            console.log(`Missed call detected - Total missed: ${callStats.today.missed}`);
+          }
+          
+          // Store completed call info
+          callStats.today.recentCalls.unshift({
+            time: new Date().toISOString(),
+            from: callData.from,
+            to: callData.to,
+            phoneNumberId: callData.phoneNumberId,
+            missed: isMissed,
+            duration: callData.duration,
+            direction: 'incoming'
+          });
+          
+          if (callStats.today.recentCalls.length > 10) {
+            callStats.today.recentCalls.pop();
+          }
+          
+          // Remove from active calls
+          delete callStats.today.activeCalls[callId];
+          
+          // Update last updated time
+          callStats.today.lastUpdated = new Date().toISOString();
+          
+          console.log(`Call completed - Missed: ${isMissed}, Total: ${callStats.today.total}, Missed: ${callStats.today.missed}`);
+        } else if (callData.direction === 'incoming' || callData.direction === 'inbound') {
+          // This is an incoming call we didn't track during ringing (maybe webhook was added mid-call)
+          // Still count it
+          callStats.today.total++;
+          
+          const isMissed = 
+            callData.status === 'missed' ||
+            callData.disposition === 'missed' ||
+            callData.answeredAt === null ||
+            callData.answered === false ||
+            (callData.duration && callData.duration === 0);
+          
+          if (isMissed) {
+            callStats.today.missed++;
+          }
+          
+          console.log(`Untracked incoming call completed - Total: ${callStats.today.total}, Missed: ${callStats.today.missed}`);
         }
-        
-        // Update last updated time
-        callStats.today.lastUpdated = new Date().toISOString();
-        
-        // Store recent call info (keep last 10)
-        callStats.today.recentCalls.unshift({
-          time: new Date().toISOString(),
-          from: callData.from,
-          to: callData.to,
-          phoneNumberId: callData.phoneNumberId,
-          missed: isMissed,
-          duration: callData.duration
-        });
-        
-        if (callStats.today.recentCalls.length > 10) {
-          callStats.today.recentCalls.pop();
-        }
-        
-        console.log(`Call processed - Total: ${callStats.today.total}, Missed: ${callStats.today.missed}`);
       }
 
       return {
