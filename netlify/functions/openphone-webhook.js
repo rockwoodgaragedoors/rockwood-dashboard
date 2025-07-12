@@ -67,7 +67,9 @@ exports.handler = async (event) => {
 
       // Try multiple possible field names for the event type
       const eventType = payload.type || payload.event || payload.eventType;
-      const callData = payload.data || payload.object || payload; // Added payload.object here!
+      
+      // The actual call data is nested in data.object
+      const callData = payload.data?.object || payload.data || payload.object || payload;
       
       console.log('Event type detected:', eventType);
       console.log('Call direction:', callData.direction);
