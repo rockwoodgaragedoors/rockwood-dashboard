@@ -60,7 +60,6 @@ exports.handler = async (event) => {
     try {
       const payload = JSON.parse(event.body);
       console.log('=== WEBHOOK RECEIVED ===');
-      console.log('Type:', payload.type);
       console.log('Full payload:', JSON.stringify(payload, null, 2));
 
       // Reset daily stats if needed
@@ -72,10 +71,11 @@ exports.handler = async (event) => {
       
       console.log('Event type detected:', eventType);
       console.log('Call direction:', callData.direction);
-      console.log('Call data structure:', Object.keys(callData));
+      console.log('Call data keys:', Object.keys(callData));
 
       // Count incoming calls on ringing
       if (eventType === 'call.ringing' || eventType === 'call_ringing') {
+        console.log('Processing call.ringing event...');
         // Only count incoming calls - check multiple possible values
         if (callData.direction === 'incoming' || callData.direction === 'inbound') {
           callStats.today.total++;
@@ -88,8 +88,13 @@ exports.handler = async (event) => {
 
       // Count missed calls on completion
       if (eventType === 'call.completed' || eventType === 'call_completed') {
+        console.log('Processing call.completed event...');
         // Only check incoming calls
         if (callData.direction === 'incoming' || callData.direction === 'inbound') {
+          console.log('Call is incoming, checking if missed...');
+          console.log('Status:', callData.status);
+          console.log('AnsweredAt:', callData.answeredAt);
+          
           // Simple missed call check - check for multiple statuses
           if (callData.status === 'missed' || 
               callData.status === 'no-answer' || 
@@ -97,7 +102,11 @@ exports.handler = async (event) => {
             callStats.today.missed++;
             callStats.today.lastUpdated = new Date().toISOString();
             console.log(`Missed call counted. Total missed: ${callStats.today.missed}`);
+          } else {
+            console.log('Call was answered, not counting as missed');
           }
+        } else {
+          console.log(`Skipped non-incoming call for missed check. Direction: ${callData.direction}`);
         }
       }
 
